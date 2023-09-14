@@ -3,6 +3,8 @@ defmodule LiveViewNativeStylesheetTest do
   doctest LiveViewNative.Stylesheet
 
   defmodule MockCompiler do
+    @behaviour LiveViewNative.Stylesheet.Compiler
+
     def compile(rules) do
       compiled_rules = %{
         "rule-1" => 1,

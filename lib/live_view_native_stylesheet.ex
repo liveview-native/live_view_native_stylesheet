@@ -1,4 +1,7 @@
 defmodule LiveViewNative.Stylesheet do
+  defmodule Compiler do
+    @callback compile(rules::binary) :: list
+  end
 
   def compile(platform, rules) do
     with {:ok, platforms} <- Application.fetch_env(:live_view_native_stylesheet, :platforms),
