@@ -41,6 +41,10 @@ defmodule LiveViewNativeStylesheetTest do
     def class("color-blue", _target) do
       "rule-2"
     end
+
+    def class(unmatched, target: target) do
+      {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)} for target: #{inspect(target)}"}
+    end
   end
 
   setup do
@@ -66,5 +70,11 @@ defmodule LiveViewNativeStylesheetTest do
     output = MockSheet.compile(["color-blue", "color-red"], target: :watch)
 
     assert output == %{"color-blue" => [4,5], "color-red" => [1,3]}
+  end
+
+  test "won't fail when an class name isn't found" do
+    output = MockSheet.compile(["foobar"], target: :watch)
+
+    assert output == %{}
   end
 end

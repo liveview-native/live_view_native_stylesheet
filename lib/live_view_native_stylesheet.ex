@@ -18,7 +18,9 @@ defmodule LiveViewNative.Stylesheet do
       def compile(class_list, target: target) do
         Enum.reduce(class_list, %{}, fn(class_name, class_map) ->
           case class(class_name, target: target) do
-            {:unmatched, _msg} -> class_map
+            {:unmatched, msg} ->
+              IO.puts(msg)
+              class_map
             rules -> Map.put(class_map, class_name, LiveViewNative.Stylesheet.compile(unquote(platform), rules))
           end
         end)
