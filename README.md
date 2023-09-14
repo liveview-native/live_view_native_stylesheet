@@ -4,6 +4,14 @@ Stylesheet primitives for LiveView Native
 
 The library is usually the dependency of another high level lib
 
+## TODO:
+
+* Similar to tailwind we need a running server that will be fed all class names from templates
+* determine how style maps will be served to the client (separate file, embed in markup?)
+* cache compiled stylesheets to avoid unnecessary recompilation
+* on each code reload in Phoenix stylesheet recompilation should be attempted
+* production sheet output
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
