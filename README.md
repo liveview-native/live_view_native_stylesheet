@@ -60,14 +60,17 @@ end
 
 ## Compiling stylesheets
 
+Stylesheets output only exactly what class names are matched in the templates. This is true of pattern matched class names as well. This
+keeps the output small lookups fast on the client.
+
 To compile a stylesheet you simply provide a list of class names and a map of ASTs will be produced. Using `MySheet` from above:
 
 ```elixir
 MySheet.compile(~w[color-blue star-red])
 
 => %{
-  "color-blue" => [["color", [[".blue", :IMF]], nil]]
-  "star-red" => [["background", [["alignment", [".trailing", :IMF]], :star-red]]
+  "color-blue" => [["color", [[".blue", :IME]], nil]]
+  "star-red" => [["background", [["alignment", [".trailing", :IME]], :star-red]]
 }
 ```
 
@@ -80,6 +83,21 @@ This map will be sent to the client for looking up the styles at runtime and app
     <Star class="color-red"/>
   </:star-red>
 </Text>
+```
+
+Some style/modifier values make more sense as attrs on the element itself. Compilers should
+support `attr(value)`:
+
+```elixir
+def class("searchable", _target) do
+  "searchable(placeholder: attr(placeholder))"
+end
+```
+
+This will instruct the client to get the value from the element the class name matches on:
+
+```heex
+<Text class="searchable" placeholder={@placeholder}>Hello, world!</Text>
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
