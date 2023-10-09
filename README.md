@@ -28,7 +28,7 @@ end
 Next add the platforms and compilers to your application config:
 
 ```elixir
-config :live_view_native_stylesheet, :platforms, 
+config :live_view_native_stylesheet, :formats, 
   swiftui: LiveViewNative.SwiftUI.StylesheetCompiler
 ```
 
@@ -38,8 +38,20 @@ config :live_view_native_stylesheet, :platforms,
 defmodule MyCustomerStyleCompiler do
   @behavior LiveViewNative.Stylesheet.Compiler
 
-  def compile(rules) do
+  def compile_sheet(sheet) do
+    # parse class names into {<funcSignature>, <rulesBody>}
+  end
+
+  def compile_rules(rules) do
     # parse rules and produce AST
+  end
+
+  defmacro sigil_SHEET(sheet, _modifier) do
+    LiveViewNative.Stylesheet.Compiler.sheet(sheet, &__MODULE__.compile_sheet/1)
+  end
+
+  defmacro sigil_RULES(rules, _modifier) do
+    LiveViewNative.Stylesheet.Compiler.rules(rules, &__MODULE__.compile_rules/1)
   end
 end
 ```
@@ -51,6 +63,12 @@ New stylesheets can be defined specific to each platform. The
 ```elixir
 defmodule MySheet do
   use LiveViewNative.Stylesheet, :swiftui
+
+  ~SHEET"""
+  "color-" <> color_name do
+    color(to_ime(color_name))
+  end
+  """
 
   def class("color-"<>color_name, _target) do
     "color(.#{color_name})"

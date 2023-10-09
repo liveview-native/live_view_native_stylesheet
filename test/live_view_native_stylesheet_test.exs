@@ -1,80 +1,35 @@
-defmodule LiveViewNativeStylesheetTest do
+defmodule LiveViewNative.StylesheetTest do
   use ExUnit.Case
   doctest LiveViewNative.Stylesheet
-
-  defmodule MockCompiler do
-    @behaviour LiveViewNative.Stylesheet.Compiler
-
-    def compile(rules) do
-      compiled_rules = %{
-        "rule-1" => 1,
-        "rule-2" => 2,
-        "rule-3" => 3,
-        "rule-4" => 4,
-        "rule-5" => 5
-      }
-
-      String.split(rules, "\n", trim: true)
-      |> Enum.map(fn(rule) ->
-        Map.get(compiled_rules, rule)
-      end)
-    end
-  end
-
-  defmodule MockSheet do
-    use LiveViewNative.Stylesheet, :mock
-
-    def class("color-red", _target) do
-      """
-      rule-1
-      rule-3
-      """
-    end
-
-    def class("color-blue", target: :watch) do
-      """
-      rule-4
-      rule-5
-      """
-    end
-
-    def class("color-blue", _target) do
-      "rule-2"
-    end
-
-    def class(unmatched, target: target) do
-      {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)} for target: #{inspect(target)}"}
-    end
-  end
-
-  setup do
-    Application.put_env(:live_view_native_stylesheet, :platforms, mock: MockCompiler)
-
-    on_exit(fn ->
-      Application.delete_env(:live_view_native_stylehseet, :platforms)
-    end)
-  end
-
-  test "will use registered platform compiler to compile ruleset" do
-    output = LiveViewNative.Stylesheet.compile(:mock, "rule-2")
-    assert output == [2]
-  end
-
   test "will compile the rules for all listed classes" do
     output = MockSheet.compile(["color-blue", "color-red"], target: nil)
 
-    assert output == %{"color-blue" => [2], "color-red" => [1,3]}
+    assert output == %{"color-blue" => [2], "color-red" => [1,3,4]}
   end
 
   test "will compile the rules for a specific target" do
     output = MockSheet.compile(["color-blue", "color-red"], target: :watch)
 
-    assert output == %{"color-blue" => [4,5], "color-red" => [1,3]}
+    assert output == %{"color-blue" => [4,5], "color-red" => [1,3,4]}
   end
 
   test "won't fail when an class name isn't found" do
     output = MockSheet.compile(["foobar"], target: :watch)
 
     assert output == %{}
+  end
+
+  describe "LiveViewNative.Stylesheet sigil" do
+    test "single rules supported" do
+      output = MockSheet.compile(["color-yellow"], target: :all)
+
+      assert output == %{"color-yellow" => [{:foobar, [], [1, 2, 3]}]}
+    end
+
+    test "multiple rules and class name pattern matching" do
+      output = MockSheet.compile(["color-hex-123"], target: :all)
+
+      assert output == %{"color-hex-123" => ["rule-31-123", {:foobar, [], [1, 2, "123"]}]}
+    end
   end
 end
