@@ -1,6 +1,11 @@
 defmodule MockRulesParser do
-  # @behaviour LiveViewNative.Stylesheet.parser
   use LiveViewNative.Stylesheet.RulesParser, :mock
+
+  defmacro __using__(_) do
+    quote do
+      import MockRulesParser, only: [sigil_RULES: 2]
+    end
+  end
 
   def parse(rules) do
     rules

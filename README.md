@@ -38,6 +38,13 @@ config :live_view_native_stylesheet, :parsers,
 defmodule MyCustomerRulesParser do
   use LiveViewNative.Stylesheet.RulesParser, :swiftui
 
+  defmacro __using__(_) do
+    quote do
+      import MyCustomRulesParser, only: [sigil_RULES: 2]
+      import MyCustomRulesHelpers
+    end
+  end
+
   def parse(rules) do
     # your custom parser defined here
   end
@@ -47,6 +54,15 @@ end
 The `format` passed in during the `use` will define a new `sigil_RULES/2` function within
 your customer parser. The `format` is carried through this function so make sure it matches
 the `format` used for the sheet itself.
+
+You *must* implement the `__using__/1` macro and at least `import` `sigil_RULES/2` from your
+custom parser. `sigil_RULES/2` is injected into your module from `LiveViewNative.Stylesheet.RulesParser`.
+This is also a good place to include other `import`s that are necessary to support the compilation of
+the final stylsheet. In the example above `import MyCustomRulesHelpers` may include additional helpers
+available to your parser's rule set.
+
+You *must* implement the `parse/1` function as this is your primary hook for parsing the rules
+found within the body of each class from the sheet
 
 ## Writing stylesheets
 

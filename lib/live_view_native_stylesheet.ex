@@ -4,8 +4,9 @@ defmodule LiveViewNative.Stylesheet do
       {:ok, parser} ->
         quote do
           import LiveViewNative.Stylesheet.SheetParser, only: [sigil_SHEET: 2]
-          import unquote(parser), only: [sigil_RULES: 2]
           import LiveViewNative.Stylesheet.RulesHelpers
+
+          use unquote(parser)
 
           @sheet_format unquote(format)
 
