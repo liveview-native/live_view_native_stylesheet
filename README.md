@@ -63,15 +63,21 @@ defmodule MySheet do
   """
 
   def class("color-"<>color_name, _target) do
-    "color(.#{color_name})"
+    ~RULES"""
+    color(to_ime(color_name))
+    """
   end
 
   def class("star-red", _target) do
-    "background(alignment: .leading){:star-red}"
+    ~RULES"""
+    background(alignment: .leading){:star-red}
+    """
   end
 
   def class("star-blue", _target) do
-    "background(alignment: .trailing){:star-blue}"
+    ~RULES"""
+    background(alignment: .trailing){:star-blue}
+    """
   end
 end
 ```
@@ -106,7 +112,9 @@ support `attr(value)`:
 
 ```elixir
 def class("searchable", _target) do
-  "searchable(placeholder: attr(placeholder))"
+  ~RULES"""
+  searchable(placeholder: attr(placeholder))
+  """
 end
 ```
 
