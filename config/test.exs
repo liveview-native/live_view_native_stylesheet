@@ -1,5 +1,5 @@
 import Config
 
-config :live_view_native_stylesheet, :formats, [
-  mock: MockCompiler
+config :live_view_native_stylesheet, :parsers, [
+  mock: MockRulesParser
 ]
