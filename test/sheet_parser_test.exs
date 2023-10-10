@@ -19,6 +19,25 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       ]
     end
 
+    test "can parse multiple class blocks" do
+      sheet = """
+      "color-red" do
+        color(.red)
+      end
+
+      "color-blue" do
+        color(.blue)
+      end
+      """
+
+      result = SheetParser.parse(sheet)
+
+      assert result == [
+        {["color-red", {:_target, [], Elixir}], "color(.red)\n"},
+        {["color-blue", {:_target, [], Elixir}], "color(.blue)\n"}
+      ]
+    end
+
     test "with pattern matching in the class name, default target is implied" do
       sheet = """
       "color-" <> color_name do
