@@ -1,9 +1,9 @@
 defmodule LiveViewNative.Stylesheet do
   defmacro __using__(format) do
-    case LiveViewNative.Stylesheet.Rules.fetch_parser(format) do
+    case LiveViewNative.Stylesheet.RulesParser.fetch(format) do
       {:ok, parser} ->
         quote do
-          import LiveViewNative.Stylesheet.Sheet, only: [sigil_SHEET: 2]
+          import LiveViewNative.Stylesheet.SheetParser, only: [sigil_SHEET: 2]
           import unquote(parser), only: [sigil_RULES: 2]
           @sheet_format unquote(format)
 
