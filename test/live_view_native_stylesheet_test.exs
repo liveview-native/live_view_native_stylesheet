@@ -1,6 +1,7 @@
 defmodule LiveViewNative.StylesheetTest do
   use ExUnit.Case
   doctest LiveViewNative.Stylesheet
+
   test "will compile the rules for all listed classes" do
     output = MockSheet.compile(["color-blue", "color-red"], target: nil)
 
