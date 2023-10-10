@@ -28,33 +28,25 @@ end
 Next add the platforms and compilers to your application config:
 
 ```elixir
-config :live_view_native_stylesheet, :formats, 
-  swiftui: LiveViewNative.SwiftUI.StylesheetCompiler
+config :live_view_native_stylesheet, :parsers, 
+  swiftui: LiveViewNative.SwiftUI.RulesParser
 ```
 
-## Building a stylesheet compiler
+## Building a stylesheet rules parser
 
 ```elixir
-defmodule MyCustomerStyleCompiler do
-  @behavior LiveViewNative.Stylesheet.Compiler
+defmodule MyCustomerRulesParser do
+  use LiveViewNative.Stylesheet.RulesParser, :swiftui
 
-  def compile_sheet(sheet) do
-    # parse class names into {<funcSignature>, <rulesBody>}
-  end
-
-  def compile_rules(rules) do
-    # parse rules and produce AST
-  end
-
-  defmacro sigil_SHEET(sheet, _modifier) do
-    LiveViewNative.Stylesheet.Compiler.sheet(sheet, &__MODULE__.compile_sheet/1)
-  end
-
-  defmacro sigil_RULES(rules, _modifier) do
-    LiveViewNative.Stylesheet.Compiler.rules(rules, &__MODULE__.compile_rules/1)
+  def parse(rules) do
+    # your custom parser defined here
   end
 end
 ```
+
+The `format` passed in during the `use` will define a new `sigil_RULES/2` function within
+your customer parser. The `format` is carried through this function so make sure it matches
+the `format` used for the sheet itself.
 
 ## Writing stylesheets
 
@@ -95,8 +87,8 @@ To compile a stylesheet you simply provide a list of class names and a map of AS
 MySheet.compile(~w[color-blue star-red])
 
 => %{
-  "color-blue" => [["color", [[".blue", :IME]], nil]]
-  "star-red" => [["background", [["alignment", [".trailing", :IME]], :star-red]]
+  "color-blue" => [{:color, [], [{:., [], [nil, :blue]}]}]    [["color", [[".blue", :IME]], nil]]
+  "star-red" => [{:background, [], [[alignment: {:., [], [nil, :trailing]}, content: :"star-red"]]}]
 }
 ```
 
@@ -105,13 +97,11 @@ This map will be sent to the client for looking up the styles at runtime and app
 ```heex
 <Text class="color-blue star-red">
   ABCDEF
-  <:star-red>
-    <Star class="color-red"/>
-  </:star-red>
+  <Star template="star-red" class="color-red"/>
 </Text>
 ```
 
-Some style/modifier values make more sense as attrs on the element itself. Compilers should
+Some style/modifier values make more sense as attrs on the element itself. Custom parsers should
 support `attr(value)`:
 
 ```elixir

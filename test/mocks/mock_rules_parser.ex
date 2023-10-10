@@ -1,6 +1,6 @@
 defmodule MockRulesParser do
   # @behaviour LiveViewNative.Stylesheet.parser
-  use LiveViewNative.Stylesheet.Rules, :mock
+  use LiveViewNative.Stylesheet.RulesParser, :mock
 
   def parse(rules) do
     rules

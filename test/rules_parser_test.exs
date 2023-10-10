@@ -1,18 +1,18 @@
-defmodule LiveViewNative.Stylesheet.RulesTest do
+defmodule LiveViewNative.Stylesheet.RulesParserTest do
   use ExUnit.Case
-  doctest LiveViewNative.Stylesheet.Rules
+  doctest LiveViewNative.Stylesheet.RulesParser
 
-  alias LiveViewNative.Stylesheet.Rules
+  alias LiveViewNative.Stylesheet.RulesParser
 
   describe "Rules.fetch_parser" do
     test "when a parser is available with the given format the designated parser module is returned" do
-      {:ok, parser} = Rules.fetch_parser(:mock)
+      {:ok, parser} = RulesParser.fetch(:mock)
 
       assert parser == MockRulesParser
     end
 
     test "when no parser is available an error is returned" do
-      {:error, message} = Rules.fetch_parser(:other)
+      {:error, message} = RulesParser.fetch(:other)
 
       assert message == "No parser found for `:other`"
     end
@@ -25,7 +25,7 @@ defmodule LiveViewNative.Stylesheet.RulesTest do
       rule-2
       """
 
-      result = Rules.parse(rules, :mock)
+      result = RulesParser.parse(rules, :mock)
 
       assert result == [1, 2]
     end
@@ -36,7 +36,7 @@ defmodule LiveViewNative.Stylesheet.RulesTest do
       rule-22
       """
 
-      result = Rules.parse(rules, :mock)
+      result = RulesParser.parse(rules, :mock)
 
       assert result == [
         {:{}, [], [:foobar, [], [1, 2, 3]]},
@@ -46,7 +46,7 @@ defmodule LiveViewNative.Stylesheet.RulesTest do
 
     test "will raise when parser is not found" do
       assert_raise RuntimeError, "No parser found for `:other`", fn ->
-        Rules.parse("", :other)
+        RulesParser.parse("", :other)
       end
     end
   end

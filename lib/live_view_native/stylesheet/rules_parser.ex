@@ -1,13 +1,17 @@
-defmodule LiveViewNative.Stylesheet.Rules do
+defmodule LiveViewNative.Stylesheet.RulesParser do
+  @callback parse(rules::binary) :: list
+
   defmacro __using__(format) do
     quote do
+      @behaviour LiveViewNative.Stylesheet.RulesParser
+
       def sigil_RULES(rules, _modifier) do
-        LiveViewNative.Stylesheet.Rules.parse(rules, unquote(format))
+        LiveViewNative.Stylesheet.RulesParser.parse(rules, unquote(format))
       end
     end
   end
 
-  def fetch_parser(format) do
+  def fetch(format) do
     with {:ok, parsers} <- Application.fetch_env(:live_view_native_stylesheet, :parsers),
     {:ok, parser} <- Keyword.fetch(parsers, format) do
       {:ok, parser}
@@ -18,7 +22,7 @@ defmodule LiveViewNative.Stylesheet.Rules do
   end
 
   def parse(body, format) do
-    case fetch_parser(format) do
+    case fetch(format) do
       {:ok, parser} ->
         body
         |> LiveViewNative.Stylesheet.Utils.eval_quoted()
