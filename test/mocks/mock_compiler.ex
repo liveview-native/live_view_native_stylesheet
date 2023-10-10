@@ -18,7 +18,7 @@ defmodule MockCompiler do
   end
 
   defp compile_rule("rule-31") do
-    {:<>, [], ["rule-31-", {:number, [], Elixir}]}
+    {:<>, [], ["rule-31-", {Elixir, [], {:number, [], Elixir}}]}
   end
 
   defp compile_rule("rule-21") do
@@ -26,7 +26,7 @@ defmodule MockCompiler do
   end
 
   defp compile_rule("rule-22") do
-    {:foobar, [], [1, 2, {:number, [], Elixir}]}
+    {:foobar, [], [1, 2, {Elixir, [], {:number, [], Elixir}}]}
   end
 
   defp compile_rule("rule-" <> number) do

@@ -31,7 +31,7 @@ defmodule LiveViewNative.Stylesheet.Compiler do
   defp escape({operator, meta, arguments}) when operator in [:<>] do
     {operator, meta, Enum.map(arguments, &escape(&1))}
   end
-  defp escape({_varname, _meta, Elixir} = expr), do: expr
+  defp escape({Elixir, _meta, expr}), do: expr
   defp escape({identity, annotations, arguments}) do
     {:{}, [], [identity, annotations, Enum.map(arguments, &escape(&1))]}
   end
