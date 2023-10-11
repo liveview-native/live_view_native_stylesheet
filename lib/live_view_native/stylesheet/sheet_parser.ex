@@ -7,7 +7,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
       rules
     else
       {:error, message, _unconsumed, _context, {line, column}, _} ->
-        # TODO: Improve errors to point
+        # TODO: Improve errors:
         # - Point to column with error in source SIGIL / sheet
         throw(
           SyntaxError.message(%{
