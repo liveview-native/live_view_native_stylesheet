@@ -49,7 +49,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet)
 
       assert result == [
-        {[{:<>, [context: Elixir, imports: [{2, Kernel}]], ["color-", {:color_name, [], Elixir}]}, {:_target, [], Elixir}], "color(color: color)\nfoobar\n"}
+        {[{:<>, [context: Elixir, imports: [{2, Kernel}]], ["color-", {:color_name, [], Elixir}]}, {:_target, [], Elixir}], "color(color: color_name)\nfoobar\n"}
       ]
     end
 
@@ -79,7 +79,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet)
 
       assert result == [
-        {[{:<>, [context: Elixir, imports: [{2, Kernel}]], ["color-", {:color_name, [], Elixir}]}, [target: :tv]], "color(color: color)\nfoobar\n"}
+        {[{:<>, [context: Elixir, imports: [{2, Kernel}]], ["color-", {:color_name, [], Elixir}]}, [target: :tv]], "color(color: color_name)\nfoobar\n"}
       ]
     end
   end

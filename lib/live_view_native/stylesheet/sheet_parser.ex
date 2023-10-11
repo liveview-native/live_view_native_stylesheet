@@ -1,5 +1,8 @@
 defmodule LiveViewNative.Stylesheet.SheetParser do
+  alias LiveViewNative.Stylesheet.SheetParser.Block
+
   def parse(sheet) do
+    {:ok, rules, _unconsumed, _context, _current_line_and_offset, _} = Block.rules_block(sheet)
     # parse sheet
     # example input
     #
@@ -17,9 +20,10 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
     # {["color-rainbow", {:_target, [], Elixir}], "red\norange\nyellow\nblue\nindigo\nviolet"}
 
     # the rules are parsed per compiler and separately
-    [
-      {["color-rainbow", {:_target, [], Elixir}], "red\norange\nyellow\nblue\nindigo\nviolet"}
-    ]
+    # [
+    #   {["color-rainbow", {:_target, [], Elixir}], "red\norange\nyellow\nblue\nindigo\nviolet"}
+    # ]
+    rules
   end
 
   defmacro sigil_SHEET(sheet, _modifier) do
