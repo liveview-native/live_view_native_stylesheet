@@ -49,7 +49,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
     |> map({String, :to_atom, []})
   end
 
-  def string() do
+  def double_quoted_string() do
     ignore(string(~s(")))
     |> repeat(
       lookahead_not(ascii_char([?"]))
@@ -66,7 +66,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
       boolean(),
       null(),
       atom(),
-      string()
+      double_quoted_string()
     ])
   end
 
@@ -74,6 +74,9 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
   # Whitespace
   #
 
+  def whitespace_char() do
+    utf8_char([?\s, ?\n, ?\r, ?\t])
+  end
   def whitespace(opts) do
     utf8_string([?\s, ?\n, ?\r, ?\t], opts)
   end
@@ -151,12 +154,11 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
     #  1+ elems
     non_empty =
       elem_combinator
-      |> ignore_whitespace()
       |> repeat(
-        ignore(string(delimiter))
+        ignore_whitespace()
+        |> ignore(string(delimiter))
         |> ignore_whitespace()
         |> concat(elem_combinator)
-        |> ignore_whitespace()
       )
 
     empty_ = ignore_whitespace(empty())

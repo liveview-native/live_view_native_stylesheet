@@ -6,7 +6,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
   import LiveViewNative.Stylesheet.SheetParser.PostProcessors
 
   string_with_variable =
-    string()
+    double_quoted_string()
     |> ignore_whitespace()
     |> ignore(string("<>"))
     |> ignore_whitespace()
@@ -16,7 +16,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
   block_open =
     choice([
       string_with_variable,
-      string()
+      double_quoted_string()
     ])
     |> optional(
       ignore_whitespace()
@@ -24,8 +24,13 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
       |> ignore_whitespace()
       |> parsec(:key_value_pairs)
     )
-    |> ignore_whitespace()
-    |> ignore(string("do"))
+    |> ignore(
+      repeat(
+        lookahead_not(string(" do"))
+        |> concat(whitespace_char())
+      )
+    )
+    |> ignore(string(" do"))
     |> post_traverse({:block_open_to_ast, []})
 
   block_close =
@@ -46,14 +51,17 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
     |> map({String, :trim_leading, []})
 
   defparsec(
-    :rules_block,
-    repeat(
+    :class_names,
+    times(
       ignore_whitespace()
       |> concat(block_open)
       |> concat(block_contents_as_string)
       |> concat(block_close)
-      |> post_traverse({:wrap_in_tuple, []})
-    ),
+      |> post_traverse({:wrap_in_tuple, []}),
+      min: 1
+    )
+    |> ignore_whitespace()
+    |> eos(),
     export_combinator: true
   )
 end

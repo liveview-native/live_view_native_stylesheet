@@ -8,7 +8,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Modifiers do
     :key_value_pairs,
     ignore_whitespace()
     |> non_empty_comma_separated_list(key_value_pair())
-    |> ignore_whitespace()
     |> wrap(),
     export_combinator: true
   )
