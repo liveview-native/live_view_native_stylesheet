@@ -8,7 +8,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.HelperFunctions do
     "to_float",
     "to_boolean",
     "camelize",
-    "snake_case"
+    "underscore"
   ]
 
   def helper_function do
