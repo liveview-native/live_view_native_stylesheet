@@ -1,6 +1,6 @@
 defmodule LiveViewNative.Stylesheet.RulesParser do
   @callback parse(rules::binary) :: list
-  @macrocallback __using__([]) :: list
+  @macrocallback __using__(format::atom) :: tuple
 
   defmacro __using__(format) do
     quote do

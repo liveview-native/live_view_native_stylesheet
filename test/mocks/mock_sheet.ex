@@ -3,8 +3,8 @@ defmodule MockSheet do
 
   ~SHEET"""
   "color-hex-" <> number do
-    rule-31-#{number}
-    rule-22(number)
+    rule-31
+    rule-22
   end
 
   "color-yellow" do
