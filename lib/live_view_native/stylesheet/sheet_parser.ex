@@ -1,25 +1,23 @@
 defmodule LiveViewNative.Stylesheet.SheetParser do
+  alias LiveViewNative.Stylesheet.SheetParser.Block
+
   def parse(sheet) do
-    # parse sheet
-    # example input
-    #
-    # "color-rainbow" do
-    #   red
-    #   orange
-    #   yellow
-    #   green
-    #   blue
-    #   indigo
-    #   violet
-    # end
-
-    # expected parsed output
-    # {["color-rainbow", {:_target, [], Elixir}], "red\norange\nyellow\nblue\nindigo\nviolet"}
-
-    # the rules are parsed per compiler and separately
-    [
-      {["color-rainbow", {:_target, [], Elixir}], "red\norange\nyellow\nblue\nindigo\nviolet"}
-    ]
+    with {:ok, rules, "" = _unconsumed, _context, _current_line_and_offset, _} <-
+           Block.class_names(sheet) do
+      rules
+    else
+      {:error, message, _unconsumed, _context, {line, column}, _} ->
+        # TODO: Improve errors:
+        # - Point to column with error in source SIGIL / sheet
+        throw(
+          SyntaxError.message(%{
+            file: "Sheet",
+            line: line,
+            column: column,
+            description: message
+          })
+        )
+    end
   end
 
   defmacro sigil_SHEET(sheet, _modifier) do
