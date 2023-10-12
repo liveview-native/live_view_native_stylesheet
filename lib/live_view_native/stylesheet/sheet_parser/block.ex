@@ -2,7 +2,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
   @moduledoc false
   import NimbleParsec
   import LiveViewNative.Stylesheet.SheetParser.Tokens
-  import LiveViewNative.Stylesheet.SheetParser.Modifiers
   import LiveViewNative.Stylesheet.SheetParser.PostProcessors
 
   string_with_variable =
@@ -13,6 +12,11 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
     |> concat(variable())
     |> post_traverse({:block_open_with_variable_to_ast, []})
 
+  key_value_pairs =
+    ignore_whitespace()
+    |> non_empty_comma_separated_list(key_value_pair())
+    |> wrap()
+
   block_open =
     choice([
       string_with_variable,
@@ -22,7 +26,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
       ignore_whitespace()
       |> ignore(string(","))
       |> ignore_whitespace()
-      |> parsec(:key_value_pairs)
+      |> concat(key_value_pairs)
     )
     |> ignore(
       repeat(
@@ -52,13 +56,12 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
 
   defparsec(
     :class_names,
-    times(
+    repeat(
       ignore_whitespace()
       |> concat(block_open)
       |> concat(block_contents_as_string)
       |> concat(block_close)
-      |> post_traverse({:wrap_in_tuple, []}),
-      min: 1
+      |> post_traverse({:wrap_in_tuple, []})
     )
     |> ignore_whitespace()
     |> eos(),
