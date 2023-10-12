@@ -16,6 +16,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.HelperFunctions do
     choice(Enum.map(@helper_functions, &string(&1)))
     |> enclosed("(", variable(), ")")
     |> post_traverse({:to_function_call_ast, []})
-    |> post_traverse({:ftag_as_elixir_code, []})
+    |> post_traverse({:tag_as_elixir_code, []})
   end
 end
