@@ -143,4 +143,13 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
     |> concat(literal())
     |> post_traverse({:to_keyword_tuple_ast, []})
   end
+
+  def enclosed(start \\ empty(), open, combinator, close) do
+    start
+    |> ignore(string(open))
+    |> ignore_whitespace()
+    |> concat(combinator)
+    |> ignore_whitespace()
+    |> ignore(string(close))
+  end
 end
