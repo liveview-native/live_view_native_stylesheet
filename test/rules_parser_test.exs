@@ -39,15 +39,35 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       result = RulesParser.parse(rules, :mock)
 
       assert result == [
-        {:{}, [], [:foobar, [], [1, 2, 3]]},
-        {:{}, [], [:foobar, [], [1, 2, {:number, [], Elixir}]]}
-      ]
+               {:{}, [], [:foobar, [], [1, 2, 3]]},
+               {:{}, [], [:foobar, [], [1, 2, {:number, [], Elixir}]]}
+             ]
     end
 
     test "will raise when parser is not found" do
       assert_raise RuntimeError, "No parser found for `:other`", fn ->
         RulesParser.parse("", :other)
       end
+    end
+  end
+
+  describe "Rules.Helper.parse" do
+    test "can parse standard helpers" do
+      input = "to_float(number)"
+
+      output = {Elixir, [], {:to_float, [], [{:number, [], Elixir}]}}
+
+      assert {:ok, [result], _, _, _, _} = MockSwiftUIHelpers.parse(input)
+      assert result == output
+    end
+
+    test "can parse additional helpers" do
+      input = "to_ime(family)"
+
+      output = {Elixir, [], {:to_ime, [], [{:family, [], Elixir}]}}
+
+      assert {:ok, [result], _, _, _, _} = MockSwiftUIHelpers.parse(input)
+      assert result == output
     end
   end
 end
