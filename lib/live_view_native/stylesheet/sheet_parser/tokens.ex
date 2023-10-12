@@ -77,6 +77,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
   def whitespace_char() do
     utf8_char([?\s, ?\n, ?\r, ?\t])
   end
+
   def whitespace(opts) do
     utf8_string([?\s, ?\n, ?\r, ?\t], opts)
   end
@@ -89,27 +90,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
     combinator |> ignore(optional(whitespace(min: 1)))
   end
 
-  # @tuple_children [
-  #   parsec(:nested_attribute),
-  #   atom(),
-  #   boolean,
-  #   variable(),
-  #   string()
-  # ]
-
-  # def tuple() do
-  #   ignore_whitespace()
-  #   |> ignore(string("{"))
-  #   |> comma_separated_list(choice(@tuple_children))
-  #   |> ignore(string("}"))
-  #   |> ignore_whitespace()
-  #   |> wrap()
-  # end
-
-  #
-  # AST
-  #
-
   def variable() do
     ascii_string([?a..?z, ?A..?Z, ?_], 1)
     |> ascii_string([?a..?z, ?A..?Z, ?0..?9, ?_], min: 1)
@@ -119,23 +99,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
 
   def word() do
     ascii_string([?a..?z, ?A..?Z, ?0..?9, ?_], min: 1)
-  end
-
-  def module_name() do
-    ascii_string([?A..?Z], 1)
-    |> ascii_string([?a..?z, ?A..?Z, ?0..?9, ?_], min: 0)
-    |> reduce({Enum, :join, [""]})
-  end
-
-  def enclosed(start \\ empty(), open, combinator, close) do
-    start
-    |> ignore_whitespace()
-    |> ignore(string(open))
-    |> ignore_whitespace()
-    |> concat(combinator)
-    |> ignore_whitespace()
-    |> ignore(string(close))
-    |> ignore_whitespace()
   end
 
   #
@@ -172,36 +135,12 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
     end
   end
 
-  def newline_separated_list(elem_combinator) do
-    #  1+ elems
-    ignore_whitespace()
-    |> concat(elem_combinator)
-    |> repeat(
-      choice([
-        ignore(optional(whitespace_except("\n", min: 1)))
-        |> ignore(string("\n"))
-        |> ignore(whitespace(min: 1))
-        |> concat(elem_combinator),
-        # Require at least one whitespace
-        ignore(whitespace(min: 1))
-      ])
-    )
-  end
-
   def key_value_pair() do
     ignore_whitespace()
     |> concat(word())
     |> concat(ignore(string(":")))
-    |> ignore_whitespace()
-    |> concat(
-      choice([
-        literal(),
-        parsec(:ime),
-        parsec(:nested_attribute),
-        parsec(:key_value_list),
-        variable()
-      ])
-    )
+    |> ignore(whitespace(min: 1))
+    |> concat(literal())
     |> post_traverse({:to_keyword_tuple_ast, []})
   end
 end
