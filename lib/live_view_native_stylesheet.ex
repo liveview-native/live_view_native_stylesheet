@@ -11,8 +11,8 @@ defmodule LiveViewNative.Stylesheet do
           @sheet_format unquote(format)
 
           def compile(class_or_list, target \\ [target: :all])
-          def compile(class_list, target: target) do
-            class_list
+          def compile(class_or_list, target: target) do
+            class_or_list
             |> List.wrap()
             |> Enum.reduce(%{}, fn(class_name, class_map) ->
               case class(class_name, target: target) do
@@ -21,6 +21,11 @@ defmodule LiveViewNative.Stylesheet do
               end
             end)
           end
+
+          def compile_string(class_or_list, target \\ [target: :all]) do
+            compile(class_or_list, target) |> inspect(limit: :infinity, charlists: :as_list)
+          end
+
         end
       {:error, message} -> raise message
     end
