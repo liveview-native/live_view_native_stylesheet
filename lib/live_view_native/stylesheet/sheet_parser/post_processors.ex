@@ -1,5 +1,4 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
-
   def wrap_in_tuple(rest, args, context, _line, _offset) do
     {rest, [List.to_tuple(Enum.reverse(args))], context}
   end
@@ -29,5 +28,11 @@ defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
 
   def to_keyword_tuple_ast(rest, [arg1, arg2], context, _line, _offset) do
     {rest, [{String.to_atom(arg2), arg1}], context}
+  end
+
+  def to_function_call_ast(rest, args, context, _line, _offset) do
+    [ast_name | other_args] = Enum.reverse(args)
+
+    {rest, [{String.to_atom(ast_name), [], other_args}], context}
   end
 end
