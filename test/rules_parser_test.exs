@@ -55,16 +55,16 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
     test "can parse standard helpers" do
       input = "to_float(number)"
 
-      output = {Elixir, [], {Elixir, [], {:to_float, [], [{:number, [], Elixir}]}}}
+      output = {Elixir, [], {:to_float, [], [{:number, [], Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
       assert result == output
     end
 
     test "can parse additional helpers" do
-      input = "to_ime(family)"
+      input = "to_abc(family)"
 
-      output = {Elixir, [], {Elixir, [], {:to_ime, [], [{:family, [], Elixir}]}}}
+      output = {Elixir, [], {:to_abc, [], [{:family, [], Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
       assert result == output
