@@ -20,6 +20,24 @@ defmodule LiveViewNative.StylesheetTest do
     assert output == %{}
   end
 
+  test "can compile without target, will default to `target: :all`" do
+    output = MockSheet.compile(["color-blue", "color-red"])
+
+    assert output == %{"color-blue" => [2], "color-red" => [1,3,4]}
+  end
+
+  test "can compile for a single class name" do
+    output = MockSheet.compile("color-blue")
+
+    assert output == %{"color-blue" => [2]}
+  end
+
+  test "can compile when a rule set is not a list" do
+    output = MockSheet.compile("single")
+
+    assert output == %{"single" => [{:single, [], [1]}]}
+  end
+
   describe "LiveViewNative.Stylesheet sigil" do
     test "single rules supported" do
       output = MockSheet.compile(["color-yellow"], target: :all)
