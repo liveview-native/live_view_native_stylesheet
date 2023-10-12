@@ -33,6 +33,10 @@ defmodule MockSheet do
     """
   end
 
+  def class("single", _target) do
+    {:single, [], [1]}
+  end
+
   def class(unmatched, target: target) do
     {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)} for target: #{inspect(target)}"}
   end
