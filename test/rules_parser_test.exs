@@ -69,5 +69,11 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
       assert result == output
     end
+
+    test "can't parse unknown helper functions" do
+      input = "to_unknown(family)"
+
+      assert {:error, _, _, _, _, _} = MockRulesHelpers.helper_function(input)
+    end
   end
 end
