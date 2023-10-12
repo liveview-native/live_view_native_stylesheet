@@ -30,8 +30,6 @@ defmodule LiveViewNative.Stylesheet.RulesParser.Helpers do
       import LiveViewNative.Stylesheet.SheetParser.PostProcessors,
         only: [to_function_call_ast: 5, to_elixir_variable_ast: 5, tag_as_elixir_code: 5]
 
-      import LiveViewNative.Stylesheet.RulesHelpers
-
       defparsec(:helper_function, unquote(module_name).parse(unquote(opts)),
         export_combinator: true
       )
