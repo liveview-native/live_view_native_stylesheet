@@ -6,7 +6,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
     quote do
       @behaviour LiveViewNative.Stylesheet.RulesParser
 
-      def sigil_RULES(rules, _modifier) do
+      defmacro sigil_RULES(rules, _modifier) do
         LiveViewNative.Stylesheet.RulesParser.parse(rules, unquote(format))
       end
     end
