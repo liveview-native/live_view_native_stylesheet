@@ -33,6 +33,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
   def to_function_call_ast(rest, args, context, _line, _offset) do
     [ast_name | other_args] = Enum.reverse(args)
 
-    {rest, [{String.to_atom(ast_name), [], other_args}], context}
+    {rest, [{Elixir, [], {String.to_atom(ast_name), [], other_args}}], context}
   end
 end
