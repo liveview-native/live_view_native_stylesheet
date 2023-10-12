@@ -62,9 +62,9 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
     end
 
     test "can parse additional helpers" do
-      input = "to_ime(family)"
+      input = "to_abc(family)"
 
-      output = {Elixir, [], {:to_ime, [], [{:family, [], Elixir}]}}
+      output = {Elixir, [], {:to_abc, [], [{:family, [], Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
       assert result == output

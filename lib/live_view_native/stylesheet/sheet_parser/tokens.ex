@@ -1,5 +1,6 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
   import NimbleParsec
+  alias LiveViewNative.Stylesheet.SheetParser.PostProcessors
 
   #
   # Literals
@@ -94,7 +95,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
     ascii_string([?a..?z, ?A..?Z, ?_], 1)
     |> ascii_string([?a..?z, ?A..?Z, ?0..?9, ?_], min: 1)
     |> reduce({Enum, :join, [""]})
-    |> post_traverse({:to_elixir_variable_ast, []})
+    |> post_traverse({PostProcessors, :to_elixir_variable_ast, []})
   end
 
   def word() do
@@ -141,7 +142,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
     |> concat(ignore(string(":")))
     |> ignore(whitespace(min: 1))
     |> concat(literal())
-    |> post_traverse({:to_keyword_tuple_ast, []})
+    |> post_traverse({PostProcessors, :to_keyword_tuple_ast, []})
   end
 
   def enclosed(start \\ empty(), open, combinator, close) do
