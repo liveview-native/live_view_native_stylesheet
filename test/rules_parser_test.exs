@@ -57,7 +57,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
       output = {Elixir, [], {:to_float, [], [{:number, [], Elixir}]}}
 
-      assert {:ok, [result], _, _, _, _} = MockSwiftUIHelpers.helper_function(input)
+      assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
       assert result == output
     end
 
@@ -66,7 +66,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
       output = {Elixir, [], {:to_ime, [], [{:family, [], Elixir}]}}
 
-      assert {:ok, [result], _, _, _, _} = MockSwiftUIHelpers.helper_function(input)
+      assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
       assert result == output
     end
   end
