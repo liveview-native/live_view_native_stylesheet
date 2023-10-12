@@ -28,6 +28,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
         body
         |> LiveViewNative.Stylesheet.Utils.eval_quoted()
         |> parser.parse()
+        |> List.wrap()
         |> Enum.map(&escape(&1))
       {:error, message} -> raise message
     end
