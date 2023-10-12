@@ -42,13 +42,13 @@ defmodule LiveViewNative.StylesheetTest do
     test "single rules supported" do
       output = MockSheet.compile(["color-yellow"], target: :all)
 
-      assert output == %{"color-yellow" => [{:{}, [], [:foobar, [], [1, 2, 3]]}]}
+      assert output == %{"color-yellow" => [{:foobar, [], [1, 2, 3]}]}
     end
 
     test "multiple rules and class name pattern matching" do
       output = MockSheet.compile(["color-hex-123"], target: :all)
 
-      assert output == %{"color-hex-123" => [{:<>, [], ["rule-31-", {:number, [], Elixir}]}, {:{}, [], [:foobar, [], [1, 2, {:number, [], Elixir}]]}]}
+      assert output == %{"color-hex-123" => ["rule-31-123", {:foobar, [], [1, 2, "123"]}]}
     end
   end
 end
