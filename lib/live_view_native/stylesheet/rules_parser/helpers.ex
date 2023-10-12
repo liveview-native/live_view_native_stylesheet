@@ -21,7 +21,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser.Helpers do
     |> post_traverse({:tag_as_elixir_code, []})
   end
 
-  defmacro __using__(opts) do
+  defmacro __using__(opts \\ []) do
     module_name = __MODULE__
 
     quote do
@@ -32,7 +32,9 @@ defmodule LiveViewNative.Stylesheet.RulesParser.Helpers do
 
       import LiveViewNative.Stylesheet.RulesHelpers
 
-      defparsec(:parse, unquote(module_name).parse(unquote(opts)))
+      defparsec(:helper_function, unquote(module_name).parse(unquote(opts)),
+        export_combinator: true
+      )
     end
   end
 end
