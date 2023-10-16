@@ -34,13 +34,15 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       rules = """
       rule-21
       rule-22
+      rule-ime
       """
 
       result = RulesParser.parse(rules, :mock)
 
       assert result == [
                {:{}, [], [:foobar, [], [1, 2, 3]]},
-               {:{}, [], [:foobar, [], [1, 2, {:number, [], Elixir}]]}
+               {:{}, [], [:foobar, [], [1, 2, {:number, [], Elixir}]]},
+               {:{}, [], [:color, [], [color: [{:{}, [], [:., [], [nil, :red]]}]]]}
              ]
     end
 

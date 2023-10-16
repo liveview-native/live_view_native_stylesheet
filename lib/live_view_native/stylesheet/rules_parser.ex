@@ -39,7 +39,13 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
   end
   defp escape({Elixir, _meta, expr}), do: expr
   defp escape({identity, annotations, arguments}) do
-    {:{}, [], [identity, annotations, Enum.map(arguments, &escape(&1))]}
+    {:{}, [], [identity, annotations, escape(arguments)]}
+  end
+  defp escape([{key, value} | tail]) do
+    [{key, escape(value)} | escape(tail)]
+  end
+  defp escape([argument | tail]) do
+    [escape(argument) | escape(tail)]
   end
   defp escape(literal), do: literal
 end
