@@ -25,6 +25,10 @@ defmodule MockRulesParser do
     {:foobar, [], [1, 2, {Elixir, [], {:number, [], Elixir}}]}
   end
 
+  defp parse_rule("rule-ime") do
+    {:color, [], [color: [{:., [], [nil, :red]}]]}
+  end
+
   defp parse_rule("rule-" <> number) do
     number
     |> Integer.parse()

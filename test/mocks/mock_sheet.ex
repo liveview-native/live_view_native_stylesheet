@@ -10,6 +10,10 @@ defmodule MockSheet do
   "color-yellow" do
     rule-21
   end
+
+  "named-argument" do
+    rule-ime
+  end
   """
 
   def class("color-red", _target) do
