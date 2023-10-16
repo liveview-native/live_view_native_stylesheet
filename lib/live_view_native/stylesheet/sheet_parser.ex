@@ -2,10 +2,8 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
   alias LiveViewNative.Stylesheet.SheetParser.Block
 
   def parse(sheet) do
-    with {:ok, rules, "" = _unconsumed, _context, _current_line_and_offset, _} <-
-           Block.class_names(sheet) do
-      rules
-    else
+    case Block.class_names(sheet) do
+      {:ok, rules, "" = _unconsumed, _context, _current_line_and_offset, _} -> rules
       {:error, message, _unconsumed, _context, {line, column}, _} ->
         # TODO: Improve errors:
         # - Point to column with error in source SIGIL / sheet
