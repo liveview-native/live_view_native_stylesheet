@@ -13,7 +13,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
     {rest, [List.to_tuple(Enum.reverse(args))], context}
   end
 
-  def block_open_with_variable_to_ast(rest, [variable, string], context, {line, _offset}, _offset) do
+  def block_open_with_variable_to_ast(rest, [variable, string], context, {line, _offset}, _byte_offset) do
     {rest,
      [
        {:<>, context_to_annotation(context, line) ++ [context: Elixir, imports: [{2, Kernel}]],
