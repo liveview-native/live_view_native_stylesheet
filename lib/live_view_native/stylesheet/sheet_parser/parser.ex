@@ -1,6 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Parser do
   import NimbleParsec
-  alias __MODULE__
   alias LiveViewNative.Stylesheet.SheetParser.Parser.Context
   alias LiveViewNative.Stylesheet.SheetParser.Parser.Error
 
@@ -79,7 +78,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser do
   end
 
   def put_error(error_parser, error_message, opts \\ []) do
-    post_traverse(error_parser, {Parser.Error, :put_error, [error_message, opts]})
+    post_traverse(error_parser, {Error, :put_error, [error_message, opts]})
   end
 
   @whitespace_chars [?\s, ?\t, ?\n, ?\r]
@@ -111,7 +110,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser do
   end
 
   def repeat_until(combinator, matches) do
-    repeat_while(combinator, {Parser, :not_match, [matches]})
+    repeat_while(combinator, {__MODULE__, :not_match, [matches]})
   end
 
   def not_match(<<char::utf8, _::binary>>, context, _, _, matches) do
