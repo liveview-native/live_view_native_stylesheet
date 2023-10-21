@@ -2,7 +2,9 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
   @moduledoc false
   import NimbleParsec
   import LiveViewNative.Stylesheet.SheetParser.Tokens
+  import LiveViewNative.Stylesheet.SheetParser.Expressions
   alias LiveViewNative.Stylesheet.SheetParser.PostProcessors
+  alias LiveViewNative.Stylesheet.SheetParser.Parser
 
   string_with_variable =
     double_quoted_string()
@@ -11,11 +13,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
     |> ignore_whitespace()
     |> concat(variable())
     |> post_traverse({PostProcessors, :block_open_with_variable_to_ast, []})
-
-  key_value_pairs =
-    ignore_whitespace()
-    |> non_empty_comma_separated_list(key_value_pair())
-    |> wrap()
 
   block_open =
     choice([
@@ -26,24 +23,21 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
       ignore_whitespace()
       |> ignore(string(","))
       |> ignore_whitespace()
-      |> concat(key_value_pairs)
+      |> concat(key_value_pairs())
     )
-    |> ignore(
-      repeat(
-        lookahead_not(string(" do"))
-        |> concat(whitespace_char())
-      )
-    )
-    |> ignore(string(" do"))
+    |> ignore_whitespace()
+    |> ignore(string("do"))
     |> post_traverse({PostProcessors, :block_open_to_ast, []})
 
   block_close =
-    ignore_whitespace()
-    |> ignore(string("end"))
+    ignore(string("end"))
 
   block_contents_as_string =
     repeat(
-      lookahead_not(block_close)
+      lookahead_not(
+        ignore_whitespace()
+        |> choice([block_close, eos()])
+      )
       |> choice([
         string("\n")
         |> ignore_whitespace(),
@@ -54,17 +48,20 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
     |> reduce({Enum, :join, [""]})
     |> map({String, :trim_leading, []})
 
+  defcombinator(
+    :class_block,
+    ignore_whitespace()
+    |> concat(block_open)
+    |> concat(block_contents_as_string)
+    |> concat(Parser.expected(block_close, error_message: "expected an end"))
+    |> post_traverse({PostProcessors, :wrap_in_tuple, []}),
+    export_combinator: true
+  )
+
   defparsec(
     :class_names,
-    repeat(
-      ignore_whitespace()
-      |> concat(block_open)
-      |> concat(block_contents_as_string)
-      |> concat(block_close)
-      |> post_traverse({PostProcessors, :wrap_in_tuple, []})
-    )
+    repeat(Parser.start(), parsec(:class_block))
     |> ignore_whitespace()
-    |> eos(),
-    export_combinator: true
+    |> Parser.expected(eos(), error_message: "invalid class header")
   )
 end

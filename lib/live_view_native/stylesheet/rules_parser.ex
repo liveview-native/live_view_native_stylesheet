@@ -30,14 +30,18 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
         |> parser.parse()
         |> List.wrap()
         |> Enum.map(&escape(&1))
-      {:error, message} -> raise message
+
+      {:error, message} ->
+        raise message
     end
   end
 
   defp escape({operator, meta, arguments}) when operator in [:<>] do
     {operator, meta, Enum.map(arguments, &escape(&1))}
   end
+
   defp escape({Elixir, _meta, expr}), do: expr
+
   defp escape({identity, annotations, arguments}) do
     {:{}, [], [identity, annotations, escape(arguments)]}
   end
@@ -47,5 +51,6 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
   defp escape([argument | tail]) do
     [escape(argument) | escape(tail)]
   end
+
   defp escape(literal), do: literal
 end
