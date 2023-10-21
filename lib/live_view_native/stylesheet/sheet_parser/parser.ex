@@ -79,8 +79,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser do
   end
 
   def put_error(error_parser, error_message, opts \\ []) do
-    error_parser
-    |> post_traverse({Parser.Error, :put_error, [error_message, opts]})
+    post_traverse(error_parser, {Parser.Error, :put_error, [error_message, opts]})
   end
 
   @whitespace_chars [?\s, ?\t, ?\n, ?\r]
