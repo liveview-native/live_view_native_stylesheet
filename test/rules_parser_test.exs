@@ -54,28 +54,71 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
   end
 
   describe "Rules.Helper.parse" do
+    @file_name __ENV__.file
+    @module __ENV__.module
+
+    def annotation(line), do: [file: @file_name, line: line, module: @module]
+
+    def parse_helper_function(source, opts \\ []) when is_list(opts) do
+      file = Keyword.get(opts, :file, "")
+      module = Keyword.get(opts, :module, "")
+      line = Keyword.get(opts, :line, 1)
+
+      parse_opts = [
+        byte_offset: 0,
+        line: {line, 0},
+        context: %{
+          file: file,
+          module: module
+        }
+      ]
+
+      MockRulesHelpers.helper_function(source, parse_opts)
+    end
+
     test "can parse standard helpers" do
       input = "to_float(number)"
 
-      output = {Elixir, [], {:to_float, [], [{:number, [], Elixir}]}}
+      output =
+        {Elixir, annotation(1), {:to_float, annotation(1), [{:number, annotation(1), Elixir}]}}
 
-      assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
+      assert {:ok, [result], _, _, _, _} =
+               parse_helper_function(input, file: @file_name, module: @module)
+
       assert result == output
     end
 
     test "can parse additional helpers" do
       input = "to_abc(family)"
 
-      output = {Elixir, [], {:to_abc, [], [{:family, [], Elixir}]}}
+      output =
+        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(1), Elixir}]}}
 
-      assert {:ok, [result], _, _, _, _} = MockRulesHelpers.helper_function(input)
+      assert {:ok, [result], _, _, _, _} =
+               parse_helper_function(input, file: @file_name, module: @module)
+
+      assert result == output
+    end
+
+    test "can parse additional helpers (2)" do
+      input = "to_abc(
+          family
+        )"
+
+      output =
+        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(2), Elixir}]}}
+
+      assert {:ok, [result], _, _, _, _} =
+               parse_helper_function(input, file: @file_name, module: @module)
+
       assert result == output
     end
 
     test "can't parse unknown helper functions" do
       input = "to_unknown(family)"
 
-      assert {:error, _, _, _, _, _} = MockRulesHelpers.helper_function(input)
+      assert {:error, "expected a 1-arity helper function" <> _, _, _, _, _} =
+               parse_helper_function(input, file: @file_name, module: @module)
     end
   end
 end
