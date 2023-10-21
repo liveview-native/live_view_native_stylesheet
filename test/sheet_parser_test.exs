@@ -25,6 +25,25 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    test "annotations can be controlled from the config" do
+      sheet = """
+      "color-red" do
+        color(.red)
+      end
+      """
+
+      Application.put_env(:live_view_native_stylesheet, :annotations, false)
+      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      Application.delete_env(:live_view_native_stylesheet, :annotations)
+
+      assert result == [
+               {[
+                  "color-red",
+                  {:_target, [], Elixir}
+                ], "color(.red)\n"}
+             ]
+    end
+
     test "can parse multiple class blocks" do
       sheet = """
       "color-red" do
