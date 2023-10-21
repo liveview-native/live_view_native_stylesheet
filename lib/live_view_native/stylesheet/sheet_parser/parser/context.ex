@@ -1,6 +1,4 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Context do
-  alias __MODULE__
-
   defstruct source: "",
             errors: [],
             file: "",
@@ -14,7 +12,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Context do
 
   def prepare_context(rest, args, context, {_line, _offset}, _byte_binary_offset) do
     {rest, args,
-     Map.put_new(context, :context, %Context{
+     Map.put_new(context, :context, %__MODULE__{
        source: rest,
        file: context[:file] || "",
        module: context[:module] || nil,
@@ -23,10 +21,10 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Context do
      })}
   end
 
-  def is_frozen?(%Context{freezes: freezes}), do: freezes > 0
-  def is_frozen?(%{context: %Context{freezes: freezes}}), do: freezes > 0
-  def has_error?(%Context{errors: errors}), do: errors != []
-  def has_error?(%{context: %Context{errors: errors}}), do: errors != []
+  def is_frozen?(%__MODULE__{freezes: freezes}), do: freezes > 0
+  def is_frozen?(%{context: %__MODULE__{freezes: freezes}}), do: freezes > 0
+  def has_error?(%__MODULE__{errors: errors}), do: errors != []
+  def has_error?(%{context: %__MODULE__{errors: errors}}), do: errors != []
 
   def put_new_error(context, _rest, error) do
     if is_frozen?(context) and not error.forced? do

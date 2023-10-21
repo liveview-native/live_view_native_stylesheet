@@ -1,6 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Error do
   alias LiveViewNative.Stylesheet.SheetParser.Parser.Context
-  alias __MODULE__
 
   defstruct([
     :incorrect_text,
@@ -33,7 +32,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Error do
     # IO.inspect({[], rest, error_message}, label: "error[0]")
 
     context =
-      Context.put_new_error(context, rest, %Error{
+      Context.put_new_error(context, rest, %__MODULE__{
         incorrect_text: "",
         line: line,
         byte_offset: byte_offset,
@@ -57,7 +56,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Error do
     # IO.inspect({matched_text, rest, error_message}, label: "error[0]")
 
     context =
-      Context.put_new_error(context, rest, %Error{
+      Context.put_new_error(context, rest, %__MODULE__{
         incorrect_text: matched_text,
         line: line,
         byte_offset: byte_offset,
@@ -70,7 +69,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Error do
   end
 
   def context_to_error_message(context) do
-    [%Error{} = error | _] = Enum.reverse(context.errors)
+    [%__MODULE__{} = error | _] = Enum.reverse(context.errors)
 
     error_message = error.error_message
     line = error.line
