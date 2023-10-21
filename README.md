@@ -30,6 +30,11 @@ Next add the platforms and compilers to your application config:
 ```elixir
 config :live_view_native_stylesheet, :parsers, 
   swiftui: LiveViewNative.SwiftUI.RulesParser
+
+# For production environments, you can opt out of annotations
+# for smaller outputs
+config :live_view_native_stylesheet,
+  annotations: false
 ```
 
 ## Building a stylesheet rules parser

@@ -1,24 +1,35 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Context do
-  defstruct source: "",
-            errors: [],
-            file: "",
-            highlight_error: true,
-            module: nil,
-            # Where in the code does the input start?
-            # Useful for localizing errors when parsing sigil text
-            source_line: 1,
-            # When freezes is greater than 0, do not accept errors
-            freezes: 0
+  defstruct [
+    :file,
+    :annotations,
+    :module,
+    source: "",
+    errors: [],
+    highlight_error: true,
+    # Where in the code does the input start?
+    # Useful for localizing errors when parsing sigil text
+    source_line: 1,
+    # When freezes is greater than 0, do not accept errors
+    freezes: 0
+  ]
 
   def prepare_context(rest, args, context, {_line, _offset}, _byte_binary_offset) do
     {rest, args,
-     Map.put_new(context, :context, %__MODULE__{
+     context
+     |> Map.put_new(:context, %__MODULE__{
        source: rest,
        file: context[:file] || "",
        module: context[:module] || nil,
        source_line: context[:source_line] || 1,
-       highlight_error: Map.get(context, :highlight_error, true)
-     })}
+       highlight_error: Map.get(context, :highlight_error, true),
+       annotations: Map.get(context, :annotations, true)
+     })
+     |> Map.drop([
+       :file,
+       :module,
+       :source_line,
+       :highlight_error
+     ])}
   end
 
   def is_frozen?(%__MODULE__{freezes: freezes}), do: freezes > 0
