@@ -23,7 +23,7 @@ defmodule LiveViewNative.Stylesheet do
           end
 
           def compile_string(class_or_list, target \\ [target: :all]) do
-            compile_ast(class_or_list, target) |> inspect(limit: :infinity, charlists: :as_list)
+            compile_ast(class_or_list, target) |> inspect(limit: :infinity, charlists: :as_list, printable_limit: :infinity)
           end
 
         end
