@@ -19,6 +19,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
 
     result =
       sheet
+      |> String.replace("\r\n", "\n")
       |> Block.class_names(parse_opts)
       |> Parser.error_from_result()
 

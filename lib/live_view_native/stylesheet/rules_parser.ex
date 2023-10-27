@@ -27,6 +27,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
       {:ok, parser} ->
         body
         |> LiveViewNative.Stylesheet.Utils.eval_quoted()
+        |> String.replace("\r\n", "\n")
         |> parser.parse()
         |> List.wrap()
         |> Enum.map(&escape(&1))

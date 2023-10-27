@@ -7,6 +7,8 @@ defmodule MockSheet do
     rule-22
   end
 
+  # this is a comment that isn't included in the output
+
   "color-yellow" do
     rule-21
   end

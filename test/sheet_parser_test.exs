@@ -25,6 +25,26 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    test "comments are ignored, unless they are part of the rules" do
+      sheet = """
+      # this is a comment that isn't included in the output
+      "color-red" do
+        color(.red)
+        # this is a comment will not be stripped
+      end
+      # this is a comment that isn't included in the output
+      """
+
+      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+
+      assert result == [
+               {[
+                  "color-red",
+                  {:_target, [file: @file_name, line: 2, module: @module], Elixir}
+                ], "color(.red)\n# this is a comment will not be stripped\n"}
+             ]
+    end
+
     test "annotations can be controlled from the config" do
       sheet = """
       "color-red" do
