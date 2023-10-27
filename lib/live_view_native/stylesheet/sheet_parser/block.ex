@@ -47,6 +47,39 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
     |> concat(whitespace(min: 1))
     |> reduce({Enum, :join, [""]})
     |> map({String, :replace_prefix, ["\n", ""]})
+    |> pre_traverse({__MODULE__, :get_position, []})
+    |> post_traverse({__MODULE__, :combine_with_position, []})
+
+  def get_position(rest, args, context, {line, _}, _) do
+    context =
+      context
+      |> Map.put(:block_file, context.context.file)
+      |> Map.put(:block_line, line + context.context.source_line)
+      |> Map.put(:block_module, context.context.module)
+
+    {rest, args, context}
+  end
+
+  def combine_with_position(rest, [body], context, _, _) do
+    opts =
+      if context.context.annotations do
+        [
+          file: context.block_file,
+          line: context.block_line,
+          module: context.block_module,
+          annotations: context.context.annotations
+        ]
+      else
+        [
+          annotations: context.context.annotations
+        ]
+      end
+
+    context =
+      Map.drop(context, [:block_line, :block_file, :block_module])
+
+    {rest, [body, opts], context}
+  end
 
   defcombinator(
     :class_block,

@@ -7,33 +7,42 @@ defmodule MockRulesParser do
     end
   end
 
-  def parse(rules) do
+  def parse(rules, opts) do
     rules
     |> String.split("\n", trim: true)
-    |> Enum.map(&parse_rule(&1))
+    |> Enum.map(&parse_rule(&1, opts))
   end
 
-  defp parse_rule("rule-31") do
+  defp parse_rule("rule-31", _opts) do
     {:<>, [], ["rule-31-", {Elixir, [], {:number, [], Elixir}}]}
   end
 
-  defp parse_rule("rule-21") do
+  defp parse_rule("rule-21", _opts) do
     {:foobar, [], [1, 2, 3]}
   end
 
-  defp parse_rule("rule-22") do
+  defp parse_rule("rule-21-annotated", opts) do
+    {:foobar,
+     [
+       file: Keyword.get(opts, :file),
+       line: Keyword.get(opts, :line),
+       module: Keyword.get(opts, :module)
+     ], [1, 2, 3]}
+  end
+
+  defp parse_rule("rule-22", _opts) do
     {:foobar, [], [1, 2, {Elixir, [], {:number, [], Elixir}}]}
   end
 
-  defp parse_rule("rule-ime") do
+  defp parse_rule("rule-ime", _opts) do
     {:color, [], [color: [{:., [], [nil, :red]}]]}
   end
 
-  defp parse_rule("rule-" <> number) do
+  defp parse_rule("rule-" <> number, _) do
     number
     |> Integer.parse()
     |> elem(0)
   end
 
-  defp parse_rule(rule), do: rule
+  defp parse_rule(rule, _), do: rule
 end
