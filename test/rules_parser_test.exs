@@ -4,6 +4,9 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
   alias LiveViewNative.Stylesheet.RulesParser
 
+  @file_name __ENV__.file
+  @module __ENV__.module
+
   describe "Rules.fetch_parser" do
     test "when a parser is available with the given format the designated parser module is returned" do
       {:ok, parser} = RulesParser.fetch(:mock)
@@ -51,12 +54,23 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
         RulesParser.parse("", :other)
       end
     end
+
+    test "will pass annotation data through to the rules parser" do
+      rules = """
+      rule-21-annotated
+      rule-21
+      """
+
+      result = RulesParser.parse(rules, :mock, file: @file_name, line: 1, module: @module)
+
+      assert result == [
+               {:{}, [], [:foobar, [file: @file_name, line: 1, module: @module], [1, 2, 3]]},
+               {:{}, [], [:foobar, [], [1, 2, 3]]},
+             ]
+    end
   end
 
   describe "Rules.Helper.parse" do
-    @file_name __ENV__.file
-    @module __ENV__.module
-
     def annotation(line), do: [file: @file_name, line: line, module: @module]
 
     def parse_helper_function(source, opts \\ []) when is_list(opts) do

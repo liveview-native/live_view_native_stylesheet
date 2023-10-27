@@ -41,14 +41,16 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
       |> LiveViewNative.Stylesheet.Utils.eval_quoted()
       |> LiveViewNative.Stylesheet.SheetParser.parse(
         file: __CALLER__.file,
-        module: __CALLER__.module,
-        line: __CALLER__.line + 1
+        line: __CALLER__.line + 1,
+        module: __CALLER__.module
       )
 
-    quote bind_quoted: [blocks: Macro.escape(blocks)] do
-      for {arguments, body} <- blocks do
+    for {arguments, opts, body} <- blocks do
+      quote bind_quoted: [arguments: Macro.escape(arguments), body: body, opts: opts] do
+        ast = LiveViewNative.Stylesheet.RulesParser.parse(body, @sheet_format, opts)
+
         def class(unquote_splicing(arguments)) do
-          sigil_RULES(unquote(body), nil)
+          unquote(ast)
         end
       end
     end
