@@ -25,11 +25,12 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
-    test "comments are ignored" do
+    test "comments are ignored, unless they are part of the rules" do
       sheet = """
       # this is a comment that isn't included in the output
       "color-red" do
         color(.red)
+        # this is a comment will not be stripped
       end
       # this is a comment that isn't included in the output
       """
@@ -40,7 +41,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                {[
                   "color-red",
                   {:_target, [file: @file_name, line: 2, module: @module], Elixir}
-                ], "color(.red)\n"}
+                ], "color(.red)\n# this is a comment will not be stripped\n"}
              ]
     end
 
