@@ -55,7 +55,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       end
     end
 
-    test "will accept annotation data" do
+    test "will pass annotation data through to the rules parser" do
       rules = """
       rule-21-annotated
       rule-21
