@@ -62,7 +62,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
   end
 
   def whitespace_except(exception, opts) do
-    utf8_string(Enum.reject(@whitespace_chars, &(<<&1>> == exception)), opts)
+    utf8_string(Enum.reject(@whitespace_chars, &(&1 == exception)), opts)
   end
 
   def ignore_whitespace(combinator \\ empty()) do

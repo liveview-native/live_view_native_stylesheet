@@ -40,13 +40,13 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
       )
       |> choice([
         string("\n")
-        |> ignore_whitespace(),
+        |> ignore(whitespace_except(?\n, min: 1)),
         ascii_string([], not: [], max: 1)
       ])
     )
     |> concat(whitespace(min: 1))
     |> reduce({Enum, :join, [""]})
-    |> map({String, :trim_leading, []})
+    |> map({String, :replace_prefix, ["\n", ""]})
 
   defcombinator(
     :class_block,
