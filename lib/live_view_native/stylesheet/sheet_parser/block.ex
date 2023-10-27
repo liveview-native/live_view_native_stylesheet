@@ -60,7 +60,13 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
 
   defparsec(
     :class_names,
-    repeat(Parser.start(), parsec(:class_block))
+    repeat(
+      Parser.start(),
+      choice([
+        comment(),
+        parsec(:class_block)
+      ])
+    )
     |> ignore_whitespace()
     |> Parser.expected(eos(), error_message: "invalid class header")
   )

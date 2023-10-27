@@ -3,6 +3,13 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Tokens do
   import LiveViewNative.Stylesheet.SheetParser.Parser
   alias LiveViewNative.Stylesheet.SheetParser.PostProcessors
 
+  def comment() do
+    ignore_whitespace()
+    |> string("#")
+    |> concat(repeat_until(utf8_char([]), [?\n]))
+    |> ignore()
+  end
+
   def boolean() do
     choice([
       replace(string("true"), true),
