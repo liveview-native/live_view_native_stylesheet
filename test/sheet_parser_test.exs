@@ -11,6 +11,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
     test "with a single literal as the class name, default target is implied" do
       sheet = """
       "color-red" do
+
         color(.red)
       end
       """
@@ -21,7 +22,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                {[
                   "color-red",
                   {:_target, [file: @file_name, line: 1, module: @module], Elixir}
-                ], "color(.red)\n"}
+                ], "\ncolor(.red)\n"}
              ]
     end
 
