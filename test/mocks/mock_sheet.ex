@@ -13,6 +13,10 @@ defmodule MockSheet do
     rule-21
   end
 
+  "rule containing end" do
+    rule-end
+  end
+
   "named-argument" do
     rule-ime
   end

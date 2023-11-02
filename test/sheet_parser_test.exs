@@ -27,7 +27,31 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                   line: 2,
                   module: @module,
                   annotations: true
-                ], "color(.red)\n"}
+                ], "color(.red)"}
+             ]
+    end
+
+    test "the token end is ignored unless it is prefixed by a whitespace and suffixed by a whitespace or eos" do
+      sheet = """
+      "color-red" do
+        rule-end
+        end-rule
+      end
+      """
+
+      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+
+      assert result == [
+               {[
+                  "color-red",
+                  {:_target, [file: @file_name, line: 1, module: @module], Elixir}
+                ],
+                [
+                  file: @file_name,
+                  line: 2,
+                  module: @module,
+                  annotations: true
+                ], "rule-end\nend-rule"}
              ]
     end
 
@@ -53,7 +77,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                   line: 3,
                   module: @module,
                   annotations: true
-                ], "color(.red)\n# this is a comment will not be stripped\n"}
+                ], "color(.red)\n# this is a comment will not be stripped"}
              ]
     end
 
@@ -72,7 +96,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                {[
                   "color-red",
                   {:_target, [], Elixir}
-                ], [annotations: false], "color(.red)\n"}
+                ], [annotations: false], "color(.red)"}
              ]
     end
 
@@ -97,14 +121,14 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                   line: 2,
                   module: @module,
                   annotations: true
-                ], "color(.red)\n"},
+                ], "color(.red)"},
                {["color-blue", {:_target, [file: @file_name, line: 5, module: @module], Elixir}],
                 [
                   file: @file_name,
                   line: 6,
                   module: @module,
                   annotations: true
-                ], "\ncolor(.blue)\n"}
+                ], "\ncolor(.blue)"}
              ]
     end
 
@@ -136,7 +160,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                   line: 2,
                   module: @module,
                   annotations: true
-                ], "color(color: color_name)\nfoobar\n"}
+                ], "color(color: color_name)\nfoobar"}
              ]
     end
 
@@ -156,7 +180,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                   line: 2,
                   module: @module,
                   annotations: true
-                ], "color(.red)\n"}
+                ], "color(.red)"}
              ]
     end
 
@@ -188,7 +212,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                   line: 2,
                   module: @module,
                   annotations: true
-                ], "color(color: color_name)\nfoobar\n"}
+                ], "color(color: color_name)\nfoobar"}
              ]
     end
 
@@ -225,7 +249,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       """
 
       assert_raise CompileError,
-                   ~r|^test/sheet_parser_test.exs:3: Invalid class block:|,
+                   ~r|^test/sheet_parser_test.exs:2: Invalid class block:|,
                    fn ->
                      SheetParser.parse(sheet, file: @file_name, module: @module)
                    end

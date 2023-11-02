@@ -29,22 +29,31 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
     |> ignore(string("do"))
     |> post_traverse({PostProcessors, :block_open_to_ast, []})
 
+  # A block must close with an end that is lead by a whitespace
+  # and trailed by a whitespace or end of string
   block_close =
-    ignore(string("end"))
+    ignore(whitespace(min: 1))
+    |> ignore(string("end"))
+    |> choice([
+      ignore(whitespace(min: 1)),
+      eos()
+    ])
 
   block_contents_as_string =
     repeat(
+      # Repeat until you find a `block_close` or the end of the string
       lookahead_not(
-        ignore_whitespace()
-        |> choice([block_close, eos()])
+        choice([
+          block_close,
+          concat(ignore(whitespace(min: 1)), eos())
+        ])
       )
       |> choice([
         string("\n")
-        |> ignore(whitespace_except(?\n, min: 1)),
+        |> ignore(whitespace_except(?\n, min: 0)),
         ascii_string([], not: [], max: 1)
       ])
     )
-    |> concat(whitespace(min: 1))
     |> reduce({Enum, :join, [""]})
     |> map({String, :replace_prefix, ["\n", ""]})
     |> pre_traverse({__MODULE__, :get_position, []})

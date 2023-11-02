@@ -38,6 +38,10 @@ defmodule MockRulesParser do
     {:color, [], [color: [{:., [], [nil, :red]}]]}
   end
 
+  defp parse_rule("rule-end", _) do
+    {:foobar, [], [1, 2]}
+  end
+
   defp parse_rule("rule-" <> number, _) do
     number
     |> Integer.parse()
