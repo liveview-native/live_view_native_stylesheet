@@ -10,7 +10,8 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
         opts = [
           file: __CALLER__.file,
           line: __CALLER__.line + 1,
-          module: __CALLER__.module
+          module: __CALLER__.module,
+          context: nil
         ]
 
         LiveViewNative.Stylesheet.RulesParser.parse(rules, unquote(format), opts)
@@ -34,7 +35,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
         body
         |> LiveViewNative.Stylesheet.Utils.eval_quoted()
         |> String.replace("\r\n", "\n")
-        |> parser.parse(opts)
+        |> parser.parse(Keyword.put_new(opts, :context, Elixir))
         |> List.wrap()
         |> Enum.map(&escape(&1))
       {:error, message} -> raise message
