@@ -14,7 +14,7 @@ defmodule MockRulesParser do
   end
 
   defp parse_rule("rule-31", opts) do
-    {:<>, [], ["rule-31-", {Elixir, [], {:number, [], Keyword.get(opts, :context)}}]}
+    {:<>, [], ["rule-31-", {Elixir, [], {:number, [], Keyword.get(opts, :variable_context)}}]}
   end
 
   defp parse_rule("rule-21", _opts) do
@@ -31,11 +31,11 @@ defmodule MockRulesParser do
   end
 
   defp parse_rule("rule-22", opts) do
-    {:foobar, [], [1, 2, {Elixir, [], {:number, [], Keyword.get(opts, :context)}}]}
+    {:foobar, [], [1, 2, {Elixir, [], {:number, [], Keyword.get(opts, :variable_context)}}]}
   end
 
   defp parse_rule("rule-23", opts) do
-    {:bazqux, [], [3, 4, {Elixir, [], {:number2, [], Keyword.get(opts, :context)}}]}
+    {:bazqux, [], [3, 4, {Elixir, [], {:number2, [], Keyword.get(opts, :variable_context)}}]}
   end
 
   defp parse_rule("rule-ime", _opts) do
