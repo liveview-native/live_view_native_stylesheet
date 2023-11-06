@@ -38,6 +38,24 @@ defmodule LiveViewNative.StylesheetTest do
     assert output == %{"single" => [{:single, [], [1]}]}
   end
 
+  test "can compile custom classes using the RULES sigil" do
+    output = MockSheet.compile_ast("custom-multi-123-456")
+
+    assert output == %{"custom-multi-123-456" => [
+      {:foobar, [], [1, 2, 123]},
+      {:bazqux, [], [3, 4, 456]}
+    ]}
+  end
+
+  test "can compile custom classes using the RULES sigil (2)" do
+    output = MockSheet.compile_ast("custom-123")
+
+    assert output == %{"custom-123" => [{:foobar, [], [1, 2, 123]}]}
+
+    output = MockSheet.compile_ast("custom-124")
+    assert output == %{"custom-124" => [{:foobar, [], [1, 2, 124]}]}
+  end
+
   describe "LiveViewNative.Stylesheet sigil" do
     test "single rules supported" do
       output = MockSheet.compile_ast(["color-yellow"], target: :all)

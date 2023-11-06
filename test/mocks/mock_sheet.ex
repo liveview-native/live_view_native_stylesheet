@@ -42,6 +42,24 @@ defmodule MockSheet do
   def class("single", _target) do
     {:single, [], [1]}
   end
+  def class("custom-multi-" <> numbers, _target) do
+    [number, number2] = String.split(numbers, "-")
+    {number, ""} = Integer.parse(number)
+    {number2, ""} = Integer.parse(number2)
+
+    ~RULES"""
+    rule-22
+    rule-23
+    """
+  end
+
+  def class("custom-" <> number, _target) do
+    {number, ""} = Integer.parse(number)
+
+    ~RULES"""
+    rule-22
+    """
+  end
 
   def class(unmatched, target: target) do
     {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)} for target: #{inspect(target)}"}

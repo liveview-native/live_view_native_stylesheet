@@ -13,8 +13,8 @@ defmodule MockRulesParser do
     |> Enum.map(&parse_rule(&1, opts))
   end
 
-  defp parse_rule("rule-31", _opts) do
-    {:<>, [], ["rule-31-", {Elixir, [], {:number, [], Elixir}}]}
+  defp parse_rule("rule-31", opts) do
+    {:<>, [], ["rule-31-", {Elixir, [], {:number, [], Keyword.get(opts, :context)}}]}
   end
 
   defp parse_rule("rule-21", _opts) do
@@ -30,8 +30,12 @@ defmodule MockRulesParser do
      ], [1, 2, 3]}
   end
 
-  defp parse_rule("rule-22", _opts) do
-    {:foobar, [], [1, 2, {Elixir, [], {:number, [], Elixir}}]}
+  defp parse_rule("rule-22", opts) do
+    {:foobar, [], [1, 2, {Elixir, [], {:number, [], Keyword.get(opts, :context)}}]}
+  end
+
+  defp parse_rule("rule-23", opts) do
+    {:bazqux, [], [3, 4, {Elixir, [], {:number2, [], Keyword.get(opts, :context)}}]}
   end
 
   defp parse_rule("rule-ime", _opts) do
