@@ -42,6 +42,7 @@ defmodule MockSheet do
   def class("single", _target) do
     {:single, [], [1]}
   end
+
   def class("custom-multi-" <> numbers, _target) do
     [number, number2] = String.split(numbers, "-")
     {number, ""} = Integer.parse(number)
