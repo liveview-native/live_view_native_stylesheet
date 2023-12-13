@@ -9,6 +9,22 @@ defmodule LiveViewNative.Stylesheet.RulesHelpers do
     Float.parse(expr) |> elem(0)
   end
 
+  def to_number(expr) when is_binary(expr) do
+    try do
+      {integer, ""} = Integer.parse(expr)
+      integer
+    rescue
+      _ ->
+      try do
+        {float, ""} = Float.parse(expr)
+        float
+      rescue
+        _ ->
+        expr
+      end
+    end
+  end
+
   def to_boolean("true"), do: true
   def to_boolean("false"), do: false
 
