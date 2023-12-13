@@ -15,7 +15,13 @@ defmodule LiveViewNative.Stylesheet.RulesHelpers do
       integer
     rescue
       _ ->
-        to_float(expr)
+      try do
+        {float, ""} = Float.parse(expr)
+        float
+      rescue
+        _ ->
+        expr
+      end
     end
   end
 
