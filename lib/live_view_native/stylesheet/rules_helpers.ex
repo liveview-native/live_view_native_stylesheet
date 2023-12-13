@@ -13,8 +13,9 @@ defmodule LiveViewNative.Stylesheet.RulesHelpers do
     try do
       {integer, ""} = Integer.parse(expr)
       integer
-    catch _ ->
-      to_float(expr)
+    rescue
+      _ ->
+        to_float(expr)
     end
   end
 
