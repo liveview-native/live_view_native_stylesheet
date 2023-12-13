@@ -71,7 +71,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
   end
 
   describe "Rules.Helper.parse" do
-    def annotation(line), do: [file: @file_name, line: line, module: @module]
+    def annotation(line, source), do: [file: @file_name, line: line, module: @module, source: source]
 
     def parse_helper_function(source, opts \\ []) when is_list(opts) do
       file = Keyword.get(opts, :file, "")
@@ -94,7 +94,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       input = "to_float(number)"
 
       output =
-        {Elixir, annotation(1), {:to_float, annotation(1), [{:number, annotation(1), Elixir}]}}
+        {Elixir, annotation(1, input), {:to_float, annotation(1, input), [{:number, annotation(1, input), Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} =
                parse_helper_function(input, file: @file_name, module: @module)
@@ -106,7 +106,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       input = "to_abc(family)"
 
       output =
-        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(1), Elixir}]}}
+        {Elixir, annotation(1, input), {:to_abc, annotation(1, input), [{:family, annotation(1, input), Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} =
                parse_helper_function(input, file: @file_name, module: @module)
@@ -120,7 +120,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
         )"
 
       output =
-        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(2), Elixir}]}}
+        {Elixir, annotation(1, "to_abc("), {:to_abc, annotation(1, "to_abc("), [{:family, annotation(2, "family"), Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} =
                parse_helper_function(input, file: @file_name, module: @module)

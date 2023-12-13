@@ -20,7 +20,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert result == [
                {[
                   "color-red",
-                  {:_target, [file: @file_name, line: 1, module: @module], Elixir}
+                  {:_target, [file: @file_name, line: 1, module: @module, source: "\"color-red\" do"], Elixir}
                 ],
                 [
                   file: @file_name,
@@ -44,7 +44,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert result == [
                {[
                   "color-red",
-                  {:_target, [file: @file_name, line: 1, module: @module], Elixir}
+                  {:_target, [file: @file_name, line: 1, module: @module, source: "\"color-red\" do"], Elixir}
                 ],
                 [
                   file: @file_name,
@@ -70,7 +70,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert result == [
                {[
                   "color-red",
-                  {:_target, [file: @file_name, line: 2, module: @module], Elixir}
+                  {:_target, [file: @file_name, line: 2, module: @module, source: "\"color-red\" do"], Elixir}
                 ],
                 [
                   file: @file_name,
@@ -115,14 +115,14 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet, file: @file_name, module: @module)
 
       assert result == [
-               {["color-red", {:_target, [file: @file_name, line: 1, module: @module], Elixir}],
+               {["color-red", {:_target, [file: @file_name, line: 1, module: @module, source: "\"color-red\" do"], Elixir}],
                 [
                   file: @file_name,
                   line: 2,
                   module: @module,
                   annotations: true
                 ], "color(.red)"},
-               {["color-blue", {:_target, [file: @file_name, line: 5, module: @module], Elixir}],
+               {["color-blue", {:_target, [file: @file_name, line: 5, module: @module, source: "\"color-blue\" do"], Elixir}],
                 [
                   file: @file_name,
                   line: 6,
@@ -149,11 +149,12 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                      file: @file_name,
                      line: 1,
                      module: @module,
+                     source: "\"color-\" <> color_name do",
                      context: Elixir,
                      imports: [{2, Kernel}]
                    ],
-                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], Elixir}]},
-                  {:_target, [file: @file_name, line: 1, module: @module], Elixir}
+                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module, source: "\"color-\" <> color_name do"], Elixir}]},
+                  {:_target, [file: @file_name, line: 1, module: @module, source: "\"color-\" <> color_name do"], Elixir}
                 ],
                 [
                   file: @file_name,
@@ -174,7 +175,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet, file: @file_name, module: @module)
 
       assert result == [
-               {["color-red", [file: @file_name, line: 1, module: @module, target: :watch]],
+               {["color-red", [file: @file_name, line: 1, module: @module, source: ~s/"color-red", target: :watch do/, target: :watch]],
                 [
                   file: @file_name,
                   line: 2,
@@ -201,11 +202,12 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                      file: @file_name,
                      line: 1,
                      module: @module,
+                     source: "\"color-\" <> color_name, target: :tv do",
                      context: Elixir,
                      imports: [{2, Kernel}]
                    ],
-                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], Elixir}]},
-                  [file: @file_name, line: 1, module: @module, target: :tv]
+                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module, source: "\"color-\" <> color_name, target: :tv do"], Elixir}]},
+                  [file: @file_name, line: 1, module: @module, source: "\"color-\" <> color_name, target: :tv do", target: :tv]
                 ],
                 [
                   file: @file_name,
