@@ -32,10 +32,14 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
   def parse(body, format, opts \\ []) do
     case fetch(format) do
       {:ok, parser} ->
+        opts = opts
+          |> Keyword.put_new(:variable_context, Elixir)
+          |> Keyword.update(:file, "", &Path.basename/1)
+          
         body
         |> LiveViewNative.Stylesheet.Utils.eval_quoted()
         |> String.replace("\r\n", "\n")
-        |> parser.parse(Keyword.put_new(opts, :variable_context, Elixir))
+        |> parser.parse(opts)
         |> List.wrap()
         |> Enum.map(&escape(&1))
       {:error, message} -> raise message

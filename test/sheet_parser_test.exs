@@ -4,7 +4,8 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
 
   alias LiveViewNative.Stylesheet.SheetParser
 
-  @file_name __ENV__.file
+  @file_path __ENV__.file
+  @file_name Path.basename(__ENV__.file) |> IO.inspect()
   @module __MODULE__
 
   describe "SheetParser.parse" do
@@ -15,7 +16,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       end
       """
 
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
                {[
@@ -39,7 +40,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       end
       """
 
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
                {[
@@ -65,7 +66,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       # this is a comment that isn't included in the output
       """
 
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
                {[
@@ -89,7 +90,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       """
 
       Application.put_env(:live_view_native_stylesheet, :annotations, false)
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
       Application.delete_env(:live_view_native_stylesheet, :annotations)
 
       assert result == [
@@ -112,7 +113,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       end
       """
 
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
                {["color-red", {:_target, [file: @file_name, line: 1, module: @module], Elixir}],
@@ -140,7 +141,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       end
       """
 
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
                {[
@@ -171,7 +172,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       end
       """
 
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
                {["color-red", [file: @file_name, line: 1, module: @module, target: :watch]],
@@ -192,7 +193,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       end
       """
 
-      result = SheetParser.parse(sheet, file: @file_name, module: @module)
+      result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
                {[
@@ -226,7 +227,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert_raise CompileError,
                    ~r|^test/sheet_parser_test.exs:1: Invalid class block:|,
                    fn ->
-                     SheetParser.parse(sheet, file: @file_name, module: @module)
+                     SheetParser.parse(sheet, file: @file_path, module: @module)
                    end
 
       sheet = """
@@ -238,7 +239,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert_raise CompileError,
                    ~r|^test/sheet_parser_test.exs:1: Invalid class block:|,
                    fn ->
-                     SheetParser.parse(sheet, file: @file_name, module: @module)
+                     SheetParser.parse(sheet, file: @file_path, module: @module)
                    end
     end
 
@@ -251,7 +252,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert_raise CompileError,
                    ~r|^test/sheet_parser_test.exs:2: Invalid class block:|,
                    fn ->
-                     SheetParser.parse(sheet, file: @file_name, module: @module)
+                     SheetParser.parse(sheet, file: @file_path, module: @module)
                    end
     end
   end

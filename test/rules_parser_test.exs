@@ -4,7 +4,8 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
   alias LiveViewNative.Stylesheet.RulesParser
 
-  @file_name __ENV__.file
+  @file_path __ENV__.file
+  @file_name Path.basename(__ENV__.file)
   @module __ENV__.module
 
   describe "Rules.fetch_parser" do
@@ -61,7 +62,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       rule-21
       """
 
-      result = RulesParser.parse(rules, :mock, file: @file_name, line: 1, module: @module)
+      result = RulesParser.parse(rules, :mock, file: @file_path, line: 1, module: @module)
 
       assert result == [
                {:{}, [], [:foobar, [file: @file_name, line: 1, module: @module], [1, 2, 3]]},
@@ -97,7 +98,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
         {Elixir, annotation(1), {:to_float, annotation(1), [{:number, annotation(1), Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} =
-               parse_helper_function(input, file: @file_name, module: @module)
+               parse_helper_function(input, file: @file_path, module: @module)
 
       assert result == output
     end
@@ -109,7 +110,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
         {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(1), Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} =
-               parse_helper_function(input, file: @file_name, module: @module)
+               parse_helper_function(input, file: @file_path, module: @module)
 
       assert result == output
     end
@@ -123,7 +124,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
         {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(2), Elixir}]}}
 
       assert {:ok, [result], _, _, _, _} =
-               parse_helper_function(input, file: @file_name, module: @module)
+               parse_helper_function(input, file: @file_path, module: @module)
 
       assert result == output
     end
@@ -132,7 +133,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       input = "to_unknown(family)"
 
       assert {:error, "expected a 1-arity helper function" <> _, _, _, _, _} =
-               parse_helper_function(input, file: @file_name, module: @module)
+               parse_helper_function(input, file: @file_path, module: @module)
     end
   end
 end
