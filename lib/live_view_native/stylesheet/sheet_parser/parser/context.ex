@@ -18,7 +18,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Context do
      context
      |> Map.put_new(:context, %__MODULE__{
        source: rest,
-       file: context[:file] || "",
+       file: Path.basename(context[:file] || ""),
        module: context[:module] || nil,
        source_line: context[:source_line] || 1,
        highlight_error: Map.get(context, :highlight_error, true),
