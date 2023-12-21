@@ -6,7 +6,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
     quote do
       @behaviour LiveViewNative.Stylesheet.RulesParser
 
-      defmacro sigil_RULES(rules, _modifier) do
+      defmacro sigil_RULES({:<<>>, meta, [expr]}, opts) do
         opts = [
           file: __CALLER__.file,
           line: __CALLER__.line + 1,
@@ -14,7 +14,17 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
           variable_context: nil
         ]
 
-        LiveViewNative.Stylesheet.RulesParser.parse(rules, unquote(format), opts)
+        rules = EEx.compile_string(expr)
+        format = unquote(format)
+        quote do
+          LiveViewNative.Stylesheet.RulesParser.parse(
+            unquote(rules),
+            unquote(format),
+            unquote(opts)
+          )
+          |> Code.eval_quoted()
+          |> elem(0)
+        end
       end
     end
   end
