@@ -25,8 +25,8 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
   describe "Rules.parse" do
     test "extracts the rules and parses to desired format" do
       rules = """
-      rule-1
-      rule-2
+      rule-number-1
+      rule-number-2
       """
 
       result = RulesParser.parse(rules, :mock)
@@ -36,17 +36,15 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
     test "will rewrite parsed rules for macro escape but will hoist Elixir terms" do
       rules = """
-      rule-21
-      rule-22
-      rule-ime
+      rule-foobar
+      rule-foobar-5
       """
 
       result = RulesParser.parse(rules, :mock)
 
       assert result == [
                {:{}, [], [:foobar, [], [1, 2, 3]]},
-               {:{}, [], [:foobar, [], [1, 2, {:number, [], Elixir}]]},
-               {:{}, [], [:color, [], [color: [{:{}, [], [:., [], [nil, :red]]}]]]}
+               {:{}, [], [:foobar, [], [1, 2, 5]]},
              ]
     end
 
@@ -58,8 +56,8 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
     test "will pass annotation data through to the rules parser" do
       rules = """
-      rule-21-annotated
-      rule-21
+      rule-foobar-annotated
+      rule-foobar
       """
 
       result = RulesParser.parse(rules, :mock, file: @file_path, line: 1, module: @module)

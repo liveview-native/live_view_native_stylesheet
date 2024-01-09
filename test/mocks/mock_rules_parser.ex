@@ -13,15 +13,16 @@ defmodule MockRulesParser do
     |> Enum.map(&parse_rule(&1, opts))
   end
 
-  defp parse_rule("rule-31", opts) do
-    {:<>, [], ["rule-31-", {Elixir, [], {:number, [], Keyword.get(opts, :variable_context)}}]}
+  defp parse_rule("color-" <> color_and_number, _opts) do
+    [color, number] = String.split(color_and_number, "-")
+    {color, number}
   end
 
-  defp parse_rule("rule-21", _opts) do
+  defp parse_rule("rule-foobar", _opts) do
     {:foobar, [], [1, 2, 3]}
   end
 
-  defp parse_rule("rule-21-annotated", opts) do
+  defp parse_rule("rule-foobar-annotated", opts) do
     {:foobar,
      [
        file: Keyword.get(opts, :file),
@@ -30,12 +31,14 @@ defmodule MockRulesParser do
      ], [1, 2, 3]}
   end
 
-  defp parse_rule("rule-22", opts) do
-    {:foobar, [], [1, 2, {Elixir, [], {:number, [], Keyword.get(opts, :variable_context)}}]}
+  defp parse_rule("rule-foobar-" <> number, _opts) do
+    number = String.to_integer(number)
+    {:foobar, [], [1, 2, number]}
   end
 
-  defp parse_rule("rule-23", opts) do
-    {:bazqux, [], [3, 4, {Elixir, [], {:number2, [], Keyword.get(opts, :variable_context)}}]}
+  defp parse_rule("rule-bazqux-" <> number, _opts) do
+    number = String.to_integer(number)
+    {:bazqux, [], [3, 4, number]}
   end
 
   defp parse_rule("rule-ime", _opts) do
@@ -46,7 +49,7 @@ defmodule MockRulesParser do
     {:foobar, [], [1, 2]}
   end
 
-  defp parse_rule("rule-" <> number, _) do
+  defp parse_rule("rule-number-" <> number, _) do
     number
     |> Integer.parse()
     |> elem(0)

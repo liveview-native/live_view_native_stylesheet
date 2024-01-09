@@ -1,19 +1,14 @@
 defmodule MockSheet do
   use LiveViewNative.Stylesheet, :mock
+  require LiveViewNative.Stylesheet.RulesParser
 
   ~SHEET"""
-  "color-hex-" <> number do
-    rule-31
-    rule-22
-  end
-
   # this is a comment that isn't included in the output
-
   "color-yellow" do
-    rule-21
+    rule-foobar
   end
 
-  "rule containing end" do
+  "rule-containing-end" do
     rule-end
   end
 
@@ -24,22 +19,22 @@ defmodule MockSheet do
 
   def class("color-red", _target) do
     ~RULES"""
-    rule-1
-    rule-3
-    rule-4
+    color-red-1
+    color-red-2
+    color-red-3
     """
   end
 
   def class("color-blue", target: :watch) do
     ~RULES"""
-    rule-4
-    rule-5
+    color-sky-1
+    color-sky-2
     """
   end
 
   def class("color-blue", _target) do
     ~RULES"""
-    rule-2
+    color-blue-3
     """
   end
 
@@ -53,8 +48,16 @@ defmodule MockSheet do
     {number2, ""} = Integer.parse(number2)
 
     ~RULES"""
-    rule-22
-    rule-23
+    rule-foobar-<%= number %>
+    rule-bazqux-<%= number2 %>
+    """
+  end
+
+  def class("custom-interpolate-" <> str, _target) do
+    [ime_str, _] = String.split(str,"-")
+
+    ~RULES"""
+    rule-<%= ime_str %>
     """
   end
 
@@ -62,7 +65,7 @@ defmodule MockSheet do
     {number, ""} = Integer.parse(number)
 
     ~RULES"""
-    rule-22
+    rule-number-<%= number %>
     """
   end
 
