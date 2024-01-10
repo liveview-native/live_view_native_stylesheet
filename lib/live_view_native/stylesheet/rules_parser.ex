@@ -20,9 +20,9 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
   end
 
   def fetch(format) do
-    with {:ok, parsers} <- Application.fetch_env(:live_view_native_stylesheet, :parsers),
-         {:ok, parser} <- Keyword.fetch(parsers, format) do
-      {:ok, parser}
+    with {:ok, plugin} <- LiveViewNative.fetch_plugin(format),
+      parser when not is_nil(parser) <- plugin.stylesheet_rules_parser do
+        {:ok, parser}
     else
       :error ->
         {:error, "No parser found for `#{inspect(format)}`"}

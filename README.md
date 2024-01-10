@@ -17,16 +17,16 @@ def deps do
 end
 ```
 
-Next add the platforms and compilers to your application config:
+## Configuration
 
-```elixir
-config :live_view_native_stylesheet, :parsers, 
-  swiftui: LiveViewNative.SwiftUI.RulesParser
+All LiveViewNative Stylesheet output can be configured. By default
+annotations and pretty printing is enabled. If you want smaller outputs
+for `prod` environments you'll need these options off:
 
-# For production environments, you can opt out of annotations
-# for smaller outputs
+```
 config :live_view_native_stylesheet,
-  annotations: false
+  annotations: false,
+  pretty: false
 ```
 
 ## Building a stylesheet rules parser
@@ -103,7 +103,7 @@ keeps the output small lookups fast on the client.
 To compile a stylesheet you simply provide a list of class names and a map of ASTs will be produced. Using `MySheet` from above:
 
 ```elixir
-MySheet.compile(~w[color-blue star-red])
+MySheet.compile_ast(~w[color-blue star-red])
 
 => %{
   "color-blue" => [{:color, [], [{:., [], [nil, :blue]}]}]    [["color", [[".blue", :IME]], nil]]
