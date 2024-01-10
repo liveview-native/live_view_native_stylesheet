@@ -51,6 +51,7 @@ defmodule LiveViewNative.Stylesheet.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:live_view_native, path: "../live_view_native"},
       {:nimble_parsec, "~> 1.3"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]

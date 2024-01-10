@@ -69,7 +69,7 @@ defmodule LiveViewNative.StylesheetTest do
       assert output == %{"color-hex-123" => ["rule-31-123", {:foobar, [], [1, 2, "123"]}]}
     end
 
-    test "can take a `as: :string` option to convert the output to a string" do
+    test "can convert the output to a string" do
       output = MockSheet.compile_string(["color-hex-123"])
 
       assert output == ~s(%{"color-hex-123" => ["rule-31-123", {:foobar, [], [1, 2, "123"]}]})

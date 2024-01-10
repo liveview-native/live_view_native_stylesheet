@@ -1,6 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser do
-  alias LiveViewNative.Stylesheet.SheetParser.Block
-  alias LiveViewNative.Stylesheet.SheetParser.Parser
+  alias LiveViewNative.Stylesheet.SheetParser.{Block, Parser}
 
   def parse(sheet, opts \\ []) do
     file = Keyword.get(opts, :file, "")
@@ -47,7 +46,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
 
     for {arguments, opts, body} <- blocks do
       quote bind_quoted: [arguments: Macro.escape(arguments), body: body, opts: opts] do
-        ast = LiveViewNative.Stylesheet.RulesParser.parse(body, @sheet_format, opts)
+        ast = LiveViewNative.Stylesheet.RulesParser.parse(body, @format, opts)
 
         def class(unquote_splicing(arguments)) do
           unquote(ast)
