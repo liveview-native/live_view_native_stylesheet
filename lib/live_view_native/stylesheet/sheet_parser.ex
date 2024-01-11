@@ -12,7 +12,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
         file: file,
         source_line: line,
         module: module,
-        annotations: Application.get_env(:live_view_native_stylesheet, :annotations, true)
+        annotations: Application.get_env(:live_view_native_stylesheet, :annotations, false)
       }
     ]
 

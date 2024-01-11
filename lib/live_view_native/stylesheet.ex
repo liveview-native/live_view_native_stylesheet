@@ -25,7 +25,7 @@ defmodule LiveViewNative.Stylesheet do
           end
 
           def compile_string(class_or_list, target \\ [target: :all]) do
-            pretty = Application.get_env(:live_view_native_stylesheet, :pretty, true)
+            pretty = Application.get_env(:live_view_native_stylesheet, :pretty, false)
 
             compile_ast(class_or_list, target)
             |> inspect(limit: :infinity, charlists: :as_list, printable_limit: :infinity, pretty: pretty)
@@ -54,6 +54,13 @@ defmodule LiveViewNative.Stylesheet do
   def file_path(module) do
     Application.get_env(:live_view_native_stylesheet, :output)
     |> Path.join(filename(module))
+  end
+
+  def embed_stylesheet(module) do
+    module
+    |> file_path()
+    |> File.read!()
+    |> Phoenix.HTML.raw()
   end
 
   defmacro __before_compile__(env) do
