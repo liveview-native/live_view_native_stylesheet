@@ -63,7 +63,7 @@ found within the body of each class from the sheet
 
 ## Writing stylesheets
 
-New stylesheets can be defined specific to each platform. The 
+New stylesheets can be defined specific to each platform.
 
 ```elixir
 defmodule MySheet do
