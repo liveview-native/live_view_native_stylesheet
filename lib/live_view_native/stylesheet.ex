@@ -37,20 +37,6 @@ defmodule LiveViewNative.Stylesheet do
             |> inspect(limit: :infinity, charlists: :as_list, printable_limit: :infinity, pretty: pretty)
           end
 
-          def embed_stylesheet(var!(assigns)) do
-            sheet =
-              __MODULE__
-              |> LiveViewNative.Stylesheet.file_path()
-              |> File.read!()
-
-            var!(assigns) = Map.put(var!(assigns), :sheet, sheet)
-
-            ~LVN"""
-            <Style><%= @sheet %></Style>
-            """
-            # Phoenix.HTML.raw("<Style>#{sheet}</Style>")
-            # LiveViewNative.Component.sigil_LVN("<Style>{@sheet}</Style>", [])
-          end
 
           def __native_opts__ do
             %{format: unquote(format)}
@@ -60,7 +46,6 @@ defmodule LiveViewNative.Stylesheet do
       {:error, message} -> raise message
     end
   end
-
 
   def filename(module) do
     format = module.__native_opts__()[:format]
