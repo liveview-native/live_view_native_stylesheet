@@ -1,3 +1,6 @@
+# The directory stylesheets generate into
+/priv/static/
+
 # The directory Mix will write compiled artifacts to.
 /_build/
 

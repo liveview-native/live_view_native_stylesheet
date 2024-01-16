@@ -1,13 +1,19 @@
 defmodule LiveViewNative.Stylesheet do
   defmacro __using__(format) do
+    %{module: module} = __CALLER__
+
+    Module.put_attribute(module, :native_opts, %{
+      format: format,
+    })
+
     case LiveViewNative.Stylesheet.RulesParser.fetch(format) do
       {:ok, parser} ->
         quote do
           import LiveViewNative.Stylesheet.SheetParser, only: [sigil_SHEET: 2]
           import LiveViewNative.Stylesheet.RulesHelpers
+          import LiveViewNative.Component, only: [sigil_LVN: 2]
 
           use unquote(parser)
-
           @format unquote(format)
           @before_compile LiveViewNative.Stylesheet
           @after_verify LiveViewNative.Stylesheet
@@ -29,6 +35,21 @@ defmodule LiveViewNative.Stylesheet do
 
             compile_ast(class_or_list, target)
             |> inspect(limit: :infinity, charlists: :as_list, printable_limit: :infinity, pretty: pretty)
+          end
+
+          def embed_stylesheet(var!(assigns)) do
+            sheet =
+              __MODULE__
+              |> LiveViewNative.Stylesheet.file_path()
+              |> File.read!()
+
+            var!(assigns) = Map.put(var!(assigns), :sheet, sheet)
+
+            ~LVN"""
+            <Style><%= @sheet %></Style>
+            """
+            # Phoenix.HTML.raw("<Style>#{sheet}</Style>")
+            # LiveViewNative.Component.sigil_LVN("<Style>{@sheet}</Style>", [])
           end
 
           def __native_opts__ do
@@ -56,13 +77,6 @@ defmodule LiveViewNative.Stylesheet do
     |> Path.join(filename(module))
   end
 
-  def embed_stylesheet(module) do
-    module
-    |> file_path()
-    |> File.read!()
-    |> Phoenix.HTML.raw()
-  end
-
   defmacro __before_compile__(env) do
     sheet_paths = Application.get_env(:live_view_native_stylesheet, :__sheet_paths__, [])
     sheet_path = Path.relative_to_cwd(env.file)
@@ -79,8 +93,12 @@ defmodule LiveViewNative.Stylesheet do
       LiveViewNative.Stylesheet.Extractor.run()
       |> module.compile_string()
     
-    module
-    |> file_path()
-    |> File.write!(compiled_sheet)
+    output_path = file_path(module)
+
+    output_path
+    |> Path.dirname()
+    |> File.mkdir_p!()
+
+    File.write(output_path, compiled_sheet)
   end
 end

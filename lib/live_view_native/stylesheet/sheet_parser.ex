@@ -46,7 +46,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
 
     for {arguments, opts, body} <- blocks do
       quote bind_quoted: [arguments: Macro.escape(arguments), body: body, opts: opts] do
-        ast = LiveViewNative.Stylesheet.RulesParser.parse(body, @format, opts)
+        ast = LiveViewNative.Stylesheet.RulesParser.parse(body, @native_opts[:format], opts)
 
         def class(unquote_splicing(arguments)) do
           unquote(ast)

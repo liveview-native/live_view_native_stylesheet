@@ -8,7 +8,23 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
   @file_name Path.basename(__ENV__.file) |> IO.inspect()
   @module __MODULE__
 
+  ExUnit.Case.register_attribute(__MODULE__, :annotations)
+
+  setup context do
+    if context.registered.annotations do
+      Application.put_env(:live_view_native_stylesheet, :annotations, true)
+
+      on_exit(fn -> 
+        Application.delete_env(:live_view_native_stylesheet, :annotations)
+      end)
+    end
+
+    :ok
+  end
+
   describe "SheetParser.parse" do
+
+    @annotations true
     test "with a single literal as the class name, default target is implied" do
       sheet = """
       "color-red" do
@@ -32,6 +48,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    @annotations true
     test "the token end is ignored unless it is prefixed by a whitespace and suffixed by a whitespace or eos" do
       sheet = """
       "color-red" do
@@ -56,6 +73,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    @annotations true
     test "comments are ignored, unless they are part of the rules" do
       sheet = """
       # this is a comment that isn't included in the output
@@ -101,6 +119,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    @annotations true
     test "can parse multiple class blocks" do
       sheet = """
       "color-red" do
@@ -133,6 +152,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    @annotations true
     test "with pattern matching in the class name, default target is implied" do
       sheet = """
       "color-" <> color_name do
@@ -165,6 +185,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    @annotations true
     test "with literal class name, target is defined" do
       sheet = """
       "color-red", target: :watch do
@@ -185,6 +206,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
              ]
     end
 
+    @annotations true
     test "with pattern matching in the class name, target is defined" do
       sheet = """
       "color-" <> color_name, target: :tv do
