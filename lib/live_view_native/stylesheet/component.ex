@@ -18,6 +18,7 @@ defmodule LiveViewNative.Stylesheet.Component do
       module
       |> LiveViewNative.Stylesheet.file_path()
       |> File.read!()
+      |> Phoenix.HTML.raw()
 
     assigns = Map.put(assigns, :sheet, sheet)
 
@@ -33,6 +34,7 @@ defmodule LiveViewNative.Stylesheet.Component do
     csrf_token = Phoenix.Controller.get_csrf_token()
 
     assigns = Map.put(assigns, :csrf_token, csrf_token)
+
     ~LVN"""
     <csrf-token value={@csrf_token} />
     """
