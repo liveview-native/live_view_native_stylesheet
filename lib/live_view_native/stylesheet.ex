@@ -16,7 +16,6 @@ defmodule LiveViewNative.Stylesheet do
           use unquote(parser)
           @format unquote(format)
           @before_compile LiveViewNative.Stylesheet
-          # @after_verify LiveViewNative.Stylesheet
 
           def compile_ast(class_or_list, target \\ [target: :all])
           def compile_ast(class_or_list, target: target) do
@@ -47,21 +46,6 @@ defmodule LiveViewNative.Stylesheet do
     end
   end
 
-  def filename(module) do
-    format = module.__native_opts__()[:format]
-
-    module
-    |> Module.split()
-    |> List.last()
-    |> Macro.underscore()
-    |> Kernel.<>(".#{format}.styles")
-  end
-
-  def file_path(module) do
-    Application.get_env(:live_view_native_stylesheet, :output)
-    |> Path.join(filename(module))
-  end
-
   defmacro __before_compile__(env) do
     sheet_paths = Application.get_env(:live_view_native_stylesheet, :__sheet_paths__, [])
     sheet_path = Path.relative_to_cwd(env.file)
@@ -72,18 +56,4 @@ defmodule LiveViewNative.Stylesheet do
       def class(_, _), do: {:unmatched, []}
     end
   end
-
-  # def __after_verify__(module) do
-  #   compiled_sheet =
-  #     LiveViewNative.Stylesheet.Extractor.run()
-  #     |> module.compile_string()
-    
-  #   output_path = file_path(module)
-
-  #   output_path
-  #   |> Path.dirname()
-  #   |> File.mkdir_p!()
-
-  #   File.write(output_path, compiled_sheet)
-  # end
 end

@@ -19,18 +19,18 @@ defmodule LiveViewNative.Stylesheet.Component do
 
     extracted_class_names = LiveViewNative.Stylesheet.Extractor.run()
 
-    compiled_sheet_string = stylesheet_module.compile_string(extracted_class_name)
+    compiled_sheet_string = stylesheet_module.compile_string(extracted_class_names)
     compiled_sheet_ast = stylesheet_module.compile_ast(extracted_class_names)
 
     quote do
       # this function is mostly intended for debugging purposes
       # it isn't intended to be used directly in your application code
       def __stylsheet_ast__ do
-        unquote(compiled_sheet_ast)
+        unquote(Macro.escape(compiled_sheet_ast))
       end
 
       def stylesheet(var!(assigns)) do
-        sheet = unquote(Macro.escape(compiled_sheet))
+        sheet = unquote(compiled_sheet_string)
         var!(assigns) = Map.put(var!(assigns), :sheet, sheet)
 
         ~LVN"""
