@@ -16,7 +16,7 @@ defmodule LiveViewNative.Stylesheet do
           use unquote(parser)
           @format unquote(format)
           @before_compile LiveViewNative.Stylesheet
-          @after_verify LiveViewNative.Stylesheet
+          # @after_verify LiveViewNative.Stylesheet
 
           def compile_ast(class_or_list, target \\ [target: :all])
           def compile_ast(class_or_list, target: target) do
@@ -73,17 +73,17 @@ defmodule LiveViewNative.Stylesheet do
     end
   end
 
-  def __after_verify__(module) do
-    compiled_sheet =
-      LiveViewNative.Stylesheet.Extractor.run()
-      |> module.compile_string()
+  # def __after_verify__(module) do
+  #   compiled_sheet =
+  #     LiveViewNative.Stylesheet.Extractor.run()
+  #     |> module.compile_string()
     
-    output_path = file_path(module)
+  #   output_path = file_path(module)
 
-    output_path
-    |> Path.dirname()
-    |> File.mkdir_p!()
+  #   output_path
+  #   |> Path.dirname()
+  #   |> File.mkdir_p!()
 
-    File.write(output_path, compiled_sheet)
-  end
+  #   File.write(output_path, compiled_sheet)
+  # end
 end

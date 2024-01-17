@@ -5,26 +5,39 @@ defmodule LiveViewNative.Stylesheet.Component do
   import LiveViewNative.Component, only: [sigil_LVN: 2]
 
   @doc """
-  Embed the stylesheet within a template
+  Embeds a stylehseet within the component module
 
-  Take a module as an attribute value:
+  Compiled stylesheet can be called with the
+  functional component `stylesheet/1`
 
   ```heex
-  <.embed_stylsheet module={MyAppWeb.HomeSheet} />
+  <.stylesheet />
   ```
   """
-  def embed_stylesheet(%{module: module} = assigns) do
-    sheet =
-      module
-      |> LiveViewNative.Stylesheet.file_path()
-      |> File.read!()
-      |> Phoenix.HTML.raw()
+  defmacro embed_stylesheet(stylesheet_module) do
+    stylesheet_module = Macro.expand(stylesheet_module, __CALLER__)
 
-    assigns = Map.put(assigns, :sheet, sheet)
+    extracted_class_names = LiveViewNative.Stylesheet.Extractor.run()
 
-    ~LVN"""
-    <Style><%= @sheet %></Style>
-    """
+    compiled_sheet_string = stylesheet_module.compile_string(extracted_class_name)
+    compiled_sheet_ast = stylesheet_module.compile_ast(extracted_class_names)
+
+    quote do
+      # this function is mostly intended for debugging purposes
+      # it isn't intended to be used directly in your application code
+      def __stylsheet_ast__ do
+        unquote(compiled_sheet_ast)
+      end
+
+      def stylesheet(var!(assigns)) do
+        sheet = unquote(Macro.escape(compiled_sheet))
+        var!(assigns) = Map.put(var!(assigns), :sheet, sheet)
+
+        ~LVN"""
+        <Style><%= @sheet %></Style>
+        """
+      end
+    end
   end
 
   @doc """
