@@ -16,7 +16,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
   def block_open_with_variable_to_ast(rest, [variable, string], context, {line, _offset}, _byte_offset) do
     {rest,
      [
-       {:<>, context_to_annotation(context, line) ++ [context: Elixir, imports: [{2, Kernel}]],
+       {:<>, context_to_annotation(context, line) ++ [context: nil, imports: [{2, Kernel}]],
         [string, variable]}
      ], context}
   end
@@ -26,7 +26,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
      [
        [
          class_name,
-         {:_target, context_to_annotation(context, line), Elixir}
+         {:_target, context_to_annotation(context, line), nil}
        ]
      ], context}
   end
@@ -42,7 +42,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
   end
 
   def to_elixir_variable_ast(rest, [variable_name], context, {line, _offset}, _byte_offset) do
-    {rest, [{String.to_atom(variable_name), context_to_annotation(context, line), Elixir}],
+    {rest, [{String.to_atom(variable_name), context_to_annotation(context, line), nil}],
      context}
   end
 

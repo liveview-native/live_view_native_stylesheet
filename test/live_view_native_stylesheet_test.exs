@@ -3,15 +3,15 @@ defmodule LiveViewNative.StylesheetTest do
   doctest LiveViewNative.Stylesheet
 
   test "will compile the rules for all listed classes" do
-    output = MockSheet.compile_ast(["color-blue", "color-red"], target: nil)
+    output = MockSheet.compile_ast(["color-blue", "color-yellow"], target: nil)
 
-    assert output == %{"color-blue" => [2], "color-red" => [1,3,4]}
+    assert output == %{"color-blue" => ["rule-2"], "color-yellow" => ["rule-yellow"]}
   end
 
   test "will compile the rules for a specific target" do
-    output = MockSheet.compile_ast(["color-blue", "color-red"], target: :watch)
+    output = MockSheet.compile_ast(["color-blue", "color-yellow"], target: :watch)
 
-    assert output == %{"color-blue" => [4,5], "color-red" => [1,3,4]}
+    assert output == %{"color-blue" => ["rule-5"], "color-yellow" => ["rule-yellow"]}
   end
 
   test "won't fail when an class name isn't found" do
@@ -21,58 +21,43 @@ defmodule LiveViewNative.StylesheetTest do
   end
 
   test "can compile without target, will default to `target: :all`" do
-    output = MockSheet.compile_ast(["color-blue", "color-red"])
+    output = MockSheet.compile_ast(["color-blue", "color-yellow"])
 
-    assert output == %{"color-blue" => [2], "color-red" => [1,3,4]}
+    assert output == %{"color-blue" => ["rule-2"], "color-yellow" => ["rule-yellow"]}
   end
 
   test "can compile for a single class name" do
     output = MockSheet.compile_ast("color-blue")
 
-    assert output == %{"color-blue" => [2]}
-  end
-
-  test "can compile when a rule set is not a list" do
-    output = MockSheet.compile_ast("single")
-
-    assert output == %{"single" => [{:single, [], [1]}]}
+    assert output == %{"color-blue" => ["rule-2"]}
   end
 
   test "can compile custom classes using the RULES sigil" do
-    output = MockSheet.compile_ast("custom-123")
+    output = MockSheet.compile_ast("custom-123-456")
 
-    assert output == %{"custom-123" => [{:foobar, [], [1, 2, 123]}]}
+    assert output == %{"custom-123-456" => ["rule-123", "rule-456"]}
 
-    output = MockSheet.compile_ast("custom-124")
-    assert output == %{"custom-124" => [{:foobar, [], [1, 2, 124]}]}
-  end
-
-  test "can compile custom classes using the RULES sigil (2)" do
-    output = MockSheet.compile_ast("custom-multi-123-456")
-
-    assert output == %{"custom-multi-123-456" => [
-      {:foobar, [], [1, 2, 123]},
-      {:bazqux, [], [3, 4, 456]}
-    ]}
+    output = MockSheet.compile_ast("custom-789-123")
+    assert output == %{"custom-789-123" => ["rule-789", "rule-123"]}
   end
 
   describe "LiveViewNative.Stylesheet sigil" do
     test "single rules supported" do
       output = MockSheet.compile_ast(["color-yellow"], target: :all)
 
-      assert output == %{"color-yellow" => [{:foobar, [], [1, 2, 3]}]}
+      assert output == %{"color-yellow" => ["rule-yellow"]}
     end
 
     test "multiple rules and class name pattern matching" do
-      output = MockSheet.compile_ast(["color-hex-123"], target: :all)
+      output = MockSheet.compile_ast(["color-number-4"], target: :all)
 
-      assert output == %{"color-hex-123" => ["rule-31-123", {:foobar, [], [1, 2, "123"]}]}
+      assert output == %{"color-number-4" => ["rule-1", "rule-24"]}
     end
 
     test "can convert the output to a string" do
-      output = MockSheet.compile_string(["color-hex-123"])
+      output = MockSheet.compile_string(["color-number-3"])
 
-      assert output == ~s(%{"color-hex-123" => ["rule-31-123", {:foobar, [], [1, 2, "123"]}]})
+      assert output == ~s(%{"color-number-3" => ["rule-1", "rule-23"]})
     end
   end
 end

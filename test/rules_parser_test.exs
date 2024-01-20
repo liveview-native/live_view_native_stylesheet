@@ -31,23 +31,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
       result = RulesParser.parse(rules, :mock)
 
-      assert result == [1, 2]
-    end
-
-    test "will rewrite parsed rules for macro escape but will hoist Elixir terms" do
-      rules = """
-      rule-21
-      rule-22
-      rule-ime
-      """
-
-      result = RulesParser.parse(rules, :mock)
-
-      assert result == [
-               {:{}, [], [:foobar, [], [1, 2, 3]]},
-               {:{}, [], [:foobar, [], [1, 2, {:number, [], Elixir}]]},
-               {:{}, [], [:color, [], [color: [{:{}, [], [:., [], [nil, :red]]}]]]}
-             ]
+      assert result == ["rule-1", "rule-2"]
     end
 
     test "will raise when parser is not found" do
@@ -58,15 +42,13 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
 
     test "will pass annotation data through to the rules parser" do
       rules = """
-      rule-21-annotated
-      rule-21
+      rule-annotated
       """
 
       result = RulesParser.parse(rules, :mock, file: @file_path, line: 1, module: @module)
 
       assert result == [
-               {:{}, [], [:foobar, [file: @file_name, line: 1, module: @module], [1, 2, 3]]},
-               {:{}, [], [:foobar, [], [1, 2, 3]]},
+               {:foobar, [file: @file_name, line: 1, module: @module], [1, 2, 3]}
              ]
     end
   end
@@ -95,7 +77,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       input = "to_float(number)"
 
       output =
-        {Elixir, annotation(1), {:to_float, annotation(1), [{:number, annotation(1), Elixir}]}}
+        {Elixir, annotation(1), {:to_float, annotation(1), [{:number, annotation(1), nil}]}}
 
       assert {:ok, [result], _, _, _, _} =
                parse_helper_function(input, file: @file_path, module: @module)
@@ -107,7 +89,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       input = "to_abc(family)"
 
       output =
-        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(1), Elixir}]}}
+        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(1), nil}]}}
 
       assert {:ok, [result], _, _, _, _} =
                parse_helper_function(input, file: @file_path, module: @module)
@@ -121,7 +103,7 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
         )"
 
       output =
-        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(2), Elixir}]}}
+        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(2), nil}]}}
 
       assert {:ok, [result], _, _, _, _} =
                parse_helper_function(input, file: @file_path, module: @module)
