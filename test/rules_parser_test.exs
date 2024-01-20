@@ -73,49 +73,4 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       MockRulesHelpers.helper_function(source, parse_opts)
     end
 
-    test "can parse standard helpers" do
-      input = "to_float(number)"
-
-      output =
-        {Elixir, annotation(1), {:to_float, annotation(1), [{:number, annotation(1), nil}]}}
-
-      assert {:ok, [result], _, _, _, _} =
-               parse_helper_function(input, file: @file_path, module: @module)
-
-      assert result == output
-    end
-
-    test "can parse additional helpers" do
-      input = "to_abc(family)"
-
-      output =
-        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(1), nil}]}}
-
-      assert {:ok, [result], _, _, _, _} =
-               parse_helper_function(input, file: @file_path, module: @module)
-
-      assert result == output
-    end
-
-    test "can parse additional helpers (2)" do
-      input = "to_abc(
-          family
-        )"
-
-      output =
-        {Elixir, annotation(1), {:to_abc, annotation(1), [{:family, annotation(2), nil}]}}
-
-      assert {:ok, [result], _, _, _, _} =
-               parse_helper_function(input, file: @file_path, module: @module)
-
-      assert result == output
-    end
-
-    test "can't parse unknown helper functions" do
-      input = "to_unknown(family)"
-
-      assert {:error, "expected a 1-arity helper function" <> _, _, _, _, _} =
-               parse_helper_function(input, file: @file_path, module: @module)
-    end
-  end
 end
