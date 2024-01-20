@@ -44,12 +44,10 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
         module: __CALLER__.module
       )
 
-    for {arguments, opts, body} <- blocks do
-      quote bind_quoted: [arguments: Macro.escape(arguments), body: body, opts: opts] do
-        ast = LiveViewNative.Stylesheet.RulesParser.parse(body, @native_opts[:format], opts)
-
+    for {arguments, _opts, body} <- blocks do
+      quote do
         def class(unquote_splicing(arguments)) do
-          unquote(ast)
+          sigil_RULES(<<unquote(body)>>, [])
         end
       end
     end

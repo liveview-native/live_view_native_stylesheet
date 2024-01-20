@@ -37,7 +37,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert result == [
                {[
                   "color-red",
-                  {:_target, [file: @file_name, line: 1, module: @module], Elixir}
+                  {:_target, [file: @file_name, line: 1, module: @module], nil}
                 ],
                 [
                   file: @file_name,
@@ -62,7 +62,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert result == [
                {[
                   "color-red",
-                  {:_target, [file: @file_name, line: 1, module: @module], Elixir}
+                  {:_target, [file: @file_name, line: 1, module: @module], nil}
                 ],
                 [
                   file: @file_name,
@@ -89,7 +89,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert result == [
                {[
                   "color-red",
-                  {:_target, [file: @file_name, line: 2, module: @module], Elixir}
+                  {:_target, [file: @file_name, line: 2, module: @module], nil}
                 ],
                 [
                   file: @file_name,
@@ -114,7 +114,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert result == [
                {[
                   "color-red",
-                  {:_target, [], Elixir}
+                  {:_target, [], nil}
                 ], [annotations: false], "color(.red)"}
              ]
     end
@@ -135,14 +135,14 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
-               {["color-red", {:_target, [file: @file_name, line: 1, module: @module], Elixir}],
+               {["color-red", {:_target, [file: @file_name, line: 1, module: @module], nil}],
                 [
                   file: @file_name,
                   line: 2,
                   module: @module,
                   annotations: true
                 ], "color(.red)"},
-               {["color-blue", {:_target, [file: @file_name, line: 5, module: @module], Elixir}],
+               {["color-blue", {:_target, [file: @file_name, line: 5, module: @module], nil}],
                 [
                   file: @file_name,
                   line: 6,
@@ -170,11 +170,11 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                      file: @file_name,
                      line: 1,
                      module: @module,
-                     context: Elixir,
+                     context: nil,
                      imports: [{2, Kernel}]
                    ],
-                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], Elixir}]},
-                  {:_target, [file: @file_name, line: 1, module: @module], Elixir}
+                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], nil}]},
+                  {:_target, [file: @file_name, line: 1, module: @module], nil}
                 ],
                 [
                   file: @file_name,
@@ -224,10 +224,10 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                      file: @file_name,
                      line: 1,
                      module: @module,
-                     context: Elixir,
+                     context: nil,
                      imports: [{2, Kernel}]
                    ],
-                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], Elixir}]},
+                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], nil}]},
                   [file: @file_name, line: 1, module: @module, target: :tv]
                 ],
                 [

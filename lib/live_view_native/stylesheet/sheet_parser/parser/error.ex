@@ -29,7 +29,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Error do
         error_message,
         opts
       ) do
-    # IO.inspect({[], rest, error_message}, label: "error[0]")
 
     context =
       Context.put_new_error(context, rest, %__MODULE__{
@@ -53,7 +52,6 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Error do
         error_message,
         opts
       ) do
-    # IO.inspect({matched_text, rest, error_message}, label: "error[0]")
 
     context =
       Context.put_new_error(context, rest, %__MODULE__{
