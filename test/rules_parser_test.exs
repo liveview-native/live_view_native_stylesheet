@@ -52,25 +52,4 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
              ]
     end
   end
-
-  describe "Rules.Helper.parse" do
-    def annotation(line), do: [file: @file_name, line: line, module: @module]
-
-    def parse_helper_function(source, opts \\ []) when is_list(opts) do
-      file = Keyword.get(opts, :file, "")
-      module = Keyword.get(opts, :module, "")
-      line = Keyword.get(opts, :line, 1)
-
-      parse_opts = [
-        byte_offset: 0,
-        line: {line, 0},
-        context: %{
-          file: file,
-          module: module
-        }
-      ]
-
-      MockRulesHelpers.helper_function(source, parse_opts)
-    end
-
 end
