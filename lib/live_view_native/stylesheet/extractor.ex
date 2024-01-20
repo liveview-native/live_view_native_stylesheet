@@ -29,16 +29,31 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     [broad_matches, inner_matches]
   end
 
-  def run do
+  def run(format) do
     sheet_paths = Application.get_env(:live_view_native_stylesheet, :__sheet_paths__, [])
 
-    Application.get_env(:live_view_native_stylesheet, :content, [])
-    |> Enum.map(&Path.wildcard(&1))
-    |> List.flatten()
-    |> Kernel.--(sheet_paths)
-    |> Enum.map(&File.read!(&1))
-    |> Enum.map(&scan(&1))
-    |> List.flatten()
-    |> Enum.uniq()
+    files =
+      Application.get_env(:live_view_native_stylesheet, :content, [])
+      |> Keyword.get(format, [])
+      |> Enum.map(&convert_to_path(&1))
+      |> Enum.map(&Path.wildcard(&1))
+      |> List.flatten()
+      |> Kernel.--(sheet_paths)
+      |> Enum.reject(&File.dir?(&1))
+
+    class_names =
+      files
+      |> Enum.map(&File.read!(&1))
+      |> Enum.map(&scan(&1))
+      |> List.flatten()
+      |> Enum.uniq()
+
+    {files, class_names}
+  end
+
+  defp convert_to_path(pattern) when is_binary(pattern), do: pattern
+  defp convert_to_path({otp_app, pattern}) do
+    Mix.Project.deps_paths[otp_app]
+    |> Path.join(pattern)
   end
 end

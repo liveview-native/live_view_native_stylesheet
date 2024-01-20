@@ -6,6 +6,9 @@ config :live_view_native, :plugins, [
 
 config :live_view_native_stylesheet,
   content: [
-    "test/**/*.*"
+    mock: [
+      "test/**/*.*",
+      {:live_view_native, "lib/**/*.*"}
+    ]
   ],
   output: "priv/static/assets"
