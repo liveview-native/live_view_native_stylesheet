@@ -29,8 +29,10 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     [broad_matches, inner_matches]
   end
 
-  def run(format) do
-    sheet_paths = Application.get_env(:live_view_native_stylesheet, :__sheet_paths__, [])
+  def run(stylesheet_module) do
+    format = stylesheet_module.__native_opts__()[:format]
+
+    sheet_path = stylesheet_module.__sheet_path__()
 
     files =
       Application.get_env(:live_view_native_stylesheet, :content, [])
@@ -38,8 +40,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
       |> Enum.map(&convert_to_path(&1))
       |> Enum.map(&Path.wildcard(&1))
       |> List.flatten()
-      |> Kernel.--(sheet_paths)
-      |> Enum.reject(&File.dir?(&1))
+      |> Enum.reject(&(File.dir?(&1) || &1 == sheet_path))
 
     class_names =
       files
@@ -47,6 +48,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
       |> Enum.map(&scan(&1))
       |> List.flatten()
       |> Enum.uniq()
+      |> Enum.reject(&(String.trim(&1) == ""))
 
     {files, class_names}
   end
