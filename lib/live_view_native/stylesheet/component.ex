@@ -16,9 +16,8 @@ defmodule LiveViewNative.Stylesheet.Component do
   """
   defmacro embed_stylesheet(stylesheet_module) do
     stylesheet_module = Macro.expand(stylesheet_module, __CALLER__)
-    format = stylesheet_module.__native_opts__[:format]
 
-    {files, class_names} = LiveViewNative.Stylesheet.Extractor.run(format)
+    {files, class_names} = LiveViewNative.Stylesheet.Extractor.run(stylesheet_module)
 
     compiled_sheet_string = stylesheet_module.compile_string(class_names)
     compiled_sheet_ast = stylesheet_module.compile_ast(class_names)

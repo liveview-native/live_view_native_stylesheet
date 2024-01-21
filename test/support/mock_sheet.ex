@@ -40,8 +40,6 @@ defmodule MockSheet do
 
   def class("custom-" <> numbers, _target) do
     [number_1, number_2] = String.split(numbers, "-")
-    {number_1, ""} = Integer.parse(number_1)
-    {number_2, ""} = Integer.parse(number_2)
 
     ~RULES"""
     rule-<%= number_1 %>
