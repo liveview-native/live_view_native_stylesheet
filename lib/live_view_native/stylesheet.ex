@@ -9,7 +9,6 @@ defmodule LiveViewNative.Stylesheet do
     quote do
       import LiveViewNative.Stylesheet.SheetParser, only: [sigil_SHEET: 2]
       import LiveViewNative.Stylesheet.RulesParser, only: [sigil_RULES: 2]
-      import LiveViewNative.Stylesheet.RulesHelpers
 
       @format unquote(format)
       @before_compile LiveViewNative.Stylesheet
