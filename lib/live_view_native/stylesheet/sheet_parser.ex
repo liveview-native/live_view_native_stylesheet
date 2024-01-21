@@ -27,7 +27,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
         rules
 
       {:error, message, _unconsumed, _context, {line, _}, _} ->
-        raise CompileError,
+        raise SyntaxError,
           description: message,
           file: file,
           line: line

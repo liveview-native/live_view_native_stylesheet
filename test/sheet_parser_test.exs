@@ -5,7 +5,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
   alias LiveViewNative.Stylesheet.SheetParser
 
   @file_path __ENV__.file
-  @file_name Path.basename(__ENV__.file) |> IO.inspect()
+  @file_name Path.basename(__ENV__.file)
   @module __MODULE__
 
   ExUnit.Case.register_attribute(__MODULE__, :annotations)
@@ -14,7 +14,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
     if context.registered.annotations do
       Application.put_env(:live_view_native_stylesheet, :annotations, true)
 
-      on_exit(fn -> 
+      on_exit(fn ->
         Application.delete_env(:live_view_native_stylesheet, :annotations)
       end)
     end
@@ -23,7 +23,6 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
   end
 
   describe "SheetParser.parse" do
-
     @annotations true
     test "with a single literal as the class name, default target is implied" do
       sheet = """
@@ -238,31 +237,97 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                 ], "color(color: color_name)\nfoobar"}
              ]
     end
+  end
 
-    test "raises compile error when block header is incorrect" do
+  describe "error reporting" do
+    setup do
+      # Disable ANSI so we don't have to worry about colors
+      Application.put_env(:elixir, :ansi_enabled, false)
+      on_exit(fn -> Application.put_env(:elixir, :ansi_enabled, true) end)
+    end
+
+    test "raises compile error when block header is incorrect (1)" do
       sheet = """
       "color-red" <> 1a do
         color(.red)
       end
       """
 
-      assert_raise CompileError,
-                   ~r|^test/sheet_parser_test.exs:1: Invalid class block:|,
-                   fn ->
-                     SheetParser.parse(sheet, file: @file_path, module: @module)
-                   end
+      error =
+        assert_raise SyntaxError,
+                     fn ->
+                       SheetParser.parse(sheet, file: @file_path, module: @module)
+                     end
 
+      error_prefix =
+        """
+        Invalid class block:
+          |
+        1 | "color-red" <> 1a do
+          |                ^^
+          |
+
+        expected a variable
+        """
+        |> String.trim()
+
+      assert String.trim(error.description) == error_prefix
+    end
+
+    test "raises compile error when block header is incorrect (2)" do
       sheet = """
       "color-red" <> do
         color(.red)
       end
       """
 
-      assert_raise CompileError,
-                   ~r|^test/sheet_parser_test.exs:1: Invalid class block:|,
-                   fn ->
-                     SheetParser.parse(sheet, file: @file_path, module: @module)
-                   end
+      error =
+        assert_raise SyntaxError,
+                     fn ->
+                       SheetParser.parse(sheet, file: @file_path, module: @module)
+                     end
+
+      error_prefix =
+        """
+        Invalid class block:
+          |
+        1 | "color-red" <> do
+          | ^^^^^^^^^^^
+          |
+
+        invalid class header
+        """
+        |> String.trim()
+
+      assert String.trim(error.description) == error_prefix
+    end
+
+    test "class names should not contain spaces" do
+      sheet = """
+      "rule containing end" do
+        color(.red)
+      end
+      """
+
+      error =
+        assert_raise SyntaxError,
+                     fn ->
+                       SheetParser.parse(sheet, file: @file_path, module: @module)
+                     end
+
+      error_prefix =
+        """
+        Invalid class block:
+          |
+        1 | "rule_containing end" do
+          |      ^
+          |
+
+        Whitespace is not allowed in the class name, but got ‘ ’
+        """
+        |> String.trim()
+
+      assert String.trim(error.description) == error_prefix
     end
 
     test "raises compile error when end is missing" do
@@ -271,11 +336,25 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
         color(.red)
       """
 
-      assert_raise CompileError,
-                   ~r|^test/sheet_parser_test.exs:2: Invalid class block:|,
-                   fn ->
-                     SheetParser.parse(sheet, file: @file_path, module: @module)
-                   end
+      error =
+        assert_raise SyntaxError,
+                     fn ->
+                       SheetParser.parse(sheet, file: @file_path, module: @module)
+                     end
+
+      error_prefix =
+        """
+          Invalid class block:
+          |
+        2 |   color(.red)
+          |
+          |
+
+        expected an end
+        """
+        |> String.trim()
+
+      assert String.trim(error.description) == error_prefix
     end
   end
 end
