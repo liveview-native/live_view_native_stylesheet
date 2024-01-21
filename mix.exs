@@ -54,7 +54,7 @@ defmodule LiveViewNative.Stylesheet.MixProject do
       # {:live_view_native, path: "../live_view_native"},
       {:live_view_native, github: "liveview-native/live_view_native", tag: "0.3.0-alpha.1"},
       {:nimble_parsec, "~> 1.3"},
-      {:floki, ">= 0.30.0"},
+      {:floki, ">= 0.30.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
