@@ -246,7 +246,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       on_exit(fn -> Application.put_env(:elixir, :ansi_enabled, true) end)
     end
 
-    test "raises compile error when block header is incorrect (1)" do
+    test "raises compile error when block header has invalid variable" do
       sheet = """
       "color-red" <> 1a do
         color(.red)
@@ -274,7 +274,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       assert String.trim(error.description) == error_prefix
     end
 
-    test "raises compile error when block header is incorrect (2)" do
+    test "raises compile error when block header is unexpectedly missing a varaible" do
       sheet = """
       "color-red" <> do
         color(.red)
