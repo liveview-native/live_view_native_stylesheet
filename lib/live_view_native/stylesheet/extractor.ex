@@ -48,10 +48,17 @@ defmodule LiveViewNative.Stylesheet.Extractor do
       |> Enum.map(&scan(&1))
       |> List.flatten()
       |> Enum.uniq()
-      |> Enum.reject(&(String.trim(&1) == ""))
+      |> Enum.reject(&rejector(&1))
 
     {files, class_names}
   end
+
+  defp rejector(name) when is_binary(name) do
+    name
+    |> String.trim()
+    |> Kernel.==("")
+  end
+  defp rejector(_other), do: false
 
   defp convert_to_path(pattern) when is_binary(pattern), do: pattern
   defp convert_to_path({otp_app, pattern}) do
