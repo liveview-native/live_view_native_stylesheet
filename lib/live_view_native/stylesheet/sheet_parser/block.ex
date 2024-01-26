@@ -6,8 +6,29 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
   alias LiveViewNative.Stylesheet.SheetParser.PostProcessors
   alias LiveViewNative.Stylesheet.SheetParser.Parser
 
+  fail_on_whitespace =
+    whitespace(min: 1)
+    |> Parser.put_error(
+      "Whitespace is not allowed in the class name",
+      show_incorrect_text?: true
+    )
+
+  # A valid class name is a double-quoted string
+  # with no whitespaces
+  valid_class_name =
+    ignore(string(~s(")))
+    |> repeat(
+      lookahead_not(ascii_char([?"]))
+      |> choice([
+        fail_on_whitespace,
+        utf8_char([])
+      ])
+    )
+    |> ignore(string(~s(")))
+    |> reduce({List, :to_string, []})
+
   string_with_variable =
-    double_quoted_string()
+    valid_class_name
     |> ignore_whitespace()
     |> ignore(string("<>"))
     |> ignore_whitespace()
@@ -17,7 +38,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
   block_open =
     choice([
       string_with_variable,
-      double_quoted_string()
+      valid_class_name
     ])
     |> optional(
       ignore_whitespace()

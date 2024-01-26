@@ -13,7 +13,7 @@ defmodule MockSheet do
     rule-yellow
   end
 
-  "rule containing end" do
+  "rule-containing-end" do
     rule-end
   end
   """
