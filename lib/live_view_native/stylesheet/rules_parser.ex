@@ -7,7 +7,11 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
       variable_context: nil
     ]
 
-    compiled_rules = EEx.compile_string(rules)
+    compiled_rules =
+      rules
+      |> String.replace("{", "<%=")
+      |> String.replace("}", "%>")
+      |> EEx.compile_string()
 
     quote do
       LiveViewNative.Stylesheet.RulesParser.parse(unquote(compiled_rules), @format, unquote(opts))

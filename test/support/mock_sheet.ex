@@ -4,7 +4,7 @@ defmodule MockSheet do
   ~SHEET"""
   "color-number-" <> number do
     rule-1
-    rule-2<%= number %>
+    rule-2{number }
   end
 
   # this is a comment that isn't included in the output
@@ -42,8 +42,8 @@ defmodule MockSheet do
     [number_1, number_2] = String.split(numbers, "-")
 
     ~RULES"""
-    rule-<%= number_1 %>
-    rule-<%= number_2 %>
+    rule-{ number_1 }
+    rule-{ number_2 }
     """
   end
 end
