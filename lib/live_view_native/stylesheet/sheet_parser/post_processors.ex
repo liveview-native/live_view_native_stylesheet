@@ -21,14 +21,8 @@ defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
      ], context}
   end
 
-  def block_open_to_ast(rest, [class_name], context, {line, _offset}, _byte_offset) do
-    {rest,
-     [
-       [
-         class_name,
-         {:_target, context_to_annotation(context, line), nil}
-       ]
-     ], context}
+  def block_open_to_ast(rest, [class_name], context, {_line, _offset}, _byte_offset) do
+    {rest, [[class_name]], context}
   end
 
   def block_open_to_ast(rest, [opts, class_name], context, {line, _}, _byte_offset) do
