@@ -18,7 +18,7 @@ defmodule MockSheet do
   end
   """
 
-  def class("color-three", _target) do
+  def class("color-three") do
     ~RULES"""
     rule-1
     rule-3
@@ -26,19 +26,13 @@ defmodule MockSheet do
     """
   end
 
-  def class("color-blue", target: :watch) do
-    ~RULES"""
-    rule-5
-    """
-  end
-
-  def class("color-blue", _target) do
+  def class("color-blue") do
     ~RULES"""
     rule-2
     """
   end
 
-  def class("custom-" <> numbers, _target) do
+  def class("custom-" <> numbers) do
     [number_1, number_2] = String.split(numbers, "-")
 
     ~RULES"""

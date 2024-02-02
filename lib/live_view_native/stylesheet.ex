@@ -13,12 +13,12 @@ defmodule LiveViewNative.Stylesheet do
       @format unquote(format)
       @before_compile LiveViewNative.Stylesheet
 
-      def compile_ast(class_or_list, target \\ [target: :all])
-      def compile_ast(class_or_list, target: target) do
+      def compile_ast(class_or_list)
+      def compile_ast(class_or_list) do
         class_or_list
         |> List.wrap()
         |> Enum.reduce(%{}, fn(class_name, class_map) ->
-          case class(class_name, target: target) do
+          case class(class_name) do
             {:unmatched, msg} -> class_map
             rules ->
               Map.put(class_map, class_name, List.wrap(rules))
@@ -26,7 +26,7 @@ defmodule LiveViewNative.Stylesheet do
         end)
       end
 
-      def compile_string(class_or_list, target \\ [target: :all]) do
+      def compile_string(class_or_list) do
         pretty = Application.get_env(:live_view_native_stylesheet, :pretty, false)
 
         class_or_list
@@ -47,8 +47,8 @@ defmodule LiveViewNative.Stylesheet do
     quote do
       def __sheet_path__, do: unquote(sheet_path)
 
-      def class(unmatched, target: target) do
-        {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)} for target: #{inspect(target)}"}
+      def class(unmatched) do
+        {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)}"}
       end
     end
   end

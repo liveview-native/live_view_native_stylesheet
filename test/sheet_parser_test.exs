@@ -24,7 +24,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
 
   describe "SheetParser.parse" do
     @annotations true
-    test "with a single literal as the class name, default target is implied" do
+    test "with a single literal as the class name" do
       sheet = """
       "color-red" do
         color(.red)
@@ -35,8 +35,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
 
       assert result == [
                {[
-                  "color-red",
-                  {:_target, [file: @file_name, line: 1, module: @module], nil}
+                  "color-red"
                 ],
                 [
                   file: @file_name,
@@ -60,8 +59,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
 
       assert result == [
                {[
-                  "color-red",
-                  {:_target, [file: @file_name, line: 1, module: @module], nil}
+                  "color-red"
                 ],
                 [
                   file: @file_name,
@@ -87,8 +85,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
 
       assert result == [
                {[
-                  "color-red",
-                  {:_target, [file: @file_name, line: 2, module: @module], nil}
+                  "color-red"
                 ],
                 [
                   file: @file_name,
@@ -110,12 +107,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet, file: @file_path, module: @module)
       Application.delete_env(:live_view_native_stylesheet, :annotations)
 
-      assert result == [
-               {[
-                  "color-red",
-                  {:_target, [], nil}
-                ], [annotations: false], "color(.red)"}
-             ]
+      assert result == [{["color-red"], [annotations: false], "color(.red)"}]
     end
 
     @annotations true
@@ -134,14 +126,14 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
-               {["color-red", {:_target, [file: @file_name, line: 1, module: @module], nil}],
+               {["color-red"],
                 [
                   file: @file_name,
                   line: 2,
                   module: @module,
                   annotations: true
                 ], "color(.red)"},
-               {["color-blue", {:_target, [file: @file_name, line: 5, module: @module], nil}],
+               {["color-blue"],
                 [
                   file: @file_name,
                   line: 6,
@@ -152,7 +144,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
     end
 
     @annotations true
-    test "with pattern matching in the class name, default target is implied" do
+    test "with pattern matching in the class name" do
       sheet = """
       "color-" <> color_name do
         color(color: color_name)
@@ -172,8 +164,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
                      context: nil,
                      imports: [{2, Kernel}]
                    ],
-                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], nil}]},
-                  {:_target, [file: @file_name, line: 1, module: @module], nil}
+                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], nil}]}
                 ],
                 [
                   file: @file_name,
@@ -185,9 +176,9 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
     end
 
     @annotations true
-    test "with literal class name, target is defined" do
+    test "with literal class name" do
       sheet = """
-      "color-red", target: :watch do
+      "color-red" do
         color(.red)
       end
       """
@@ -195,46 +186,13 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet, file: @file_path, module: @module)
 
       assert result == [
-               {["color-red", [file: @file_name, line: 1, module: @module, target: :watch]],
+               {["color-red"],
                 [
                   file: @file_name,
                   line: 2,
                   module: @module,
                   annotations: true
                 ], "color(.red)"}
-             ]
-    end
-
-    @annotations true
-    test "with pattern matching in the class name, target is defined" do
-      sheet = """
-      "color-" <> color_name, target: :tv do
-        color(color: color_name)
-        foobar
-      end
-      """
-
-      result = SheetParser.parse(sheet, file: @file_path, module: @module)
-
-      assert result == [
-               {[
-                  {:<>,
-                   [
-                     file: @file_name,
-                     line: 1,
-                     module: @module,
-                     context: nil,
-                     imports: [{2, Kernel}]
-                   ],
-                   ["color-", {:color_name, [file: @file_name, line: 1, module: @module], nil}]},
-                  [file: @file_name, line: 1, module: @module, target: :tv]
-                ],
-                [
-                  file: @file_name,
-                  line: 2,
-                  module: @module,
-                  annotations: true
-                ], "color(color: color_name)\nfoobar"}
              ]
     end
   end

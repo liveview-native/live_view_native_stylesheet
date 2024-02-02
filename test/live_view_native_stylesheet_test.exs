@@ -19,27 +19,15 @@ defmodule LiveViewNative.StylesheetTest do
   end
 
   test "will compile the rules for all listed classes" do
-    output = MockSheet.compile_ast(["color-blue", "color-yellow"], target: nil)
-
-    assert output == %{"color-blue" => ["rule-2"], "color-yellow" => ["rule-yellow"]}
-  end
-
-  test "will compile the rules for a specific target" do
-    output = MockSheet.compile_ast(["color-blue", "color-yellow"], target: :watch)
-
-    assert output == %{"color-blue" => ["rule-5"], "color-yellow" => ["rule-yellow"]}
-  end
-
-  test "won't fail when an class name isn't found" do
-    output = MockSheet.compile_ast(["foobar"], target: :watch)
-
-    assert output == %{}
-  end
-
-  test "can compile without target, will default to `target: :all`" do
     output = MockSheet.compile_ast(["color-blue", "color-yellow"])
 
     assert output == %{"color-blue" => ["rule-2"], "color-yellow" => ["rule-yellow"]}
+  end
+
+  test "won't fail when an class name isn't found" do
+    output = MockSheet.compile_ast(["foobar"])
+
+    assert output == %{}
   end
 
   test "can compile for a single class name" do
@@ -59,13 +47,13 @@ defmodule LiveViewNative.StylesheetTest do
 
   describe "LiveViewNative.Stylesheet sigil" do
     test "single rules supported" do
-      output = MockSheet.compile_ast(["color-yellow"], target: :all)
+      output = MockSheet.compile_ast(["color-yellow"])
 
       assert output == %{"color-yellow" => ["rule-yellow"]}
     end
 
     test "multiple rules and class name pattern matching" do
-      output = MockSheet.compile_ast(["color-number-4"], target: :all)
+      output = MockSheet.compile_ast(["color-number-4"])
 
       assert output == %{"color-number-4" => ["rule-1", "rule-24"]}
     end
