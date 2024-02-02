@@ -40,4 +40,13 @@ defmodule MockSheet do
     rule-{ number_2 }
     """
   end
+
+  def class("raise-" <> numbers) do
+    [number_1, number_2] = String.split(numbers, ":")
+
+    ~RULES"""
+    rule-{ number_1 }
+    rule-{ number_2 }
+    """
+  end
 end

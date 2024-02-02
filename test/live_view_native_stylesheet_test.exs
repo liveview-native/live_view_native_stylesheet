@@ -1,5 +1,6 @@
 defmodule LiveViewNative.StylesheetTest do
   use ExUnit.Case
+  import ExUnit.CaptureIO
   doctest LiveViewNative.Stylesheet
 
   describe "embed_stylesheet" do
@@ -43,6 +44,13 @@ defmodule LiveViewNative.StylesheetTest do
 
     output = MockSheet.compile_ast("custom-789-123")
     assert output == %{"custom-789-123" => ["rule-789", "rule-123"]}
+  end
+
+  test "will capture and log any raises within `class/1` when compiling stylesheet" do
+    assert capture_io(:user, fn ->
+      assert MockSheet.compile_ast(["raise-12"]) == %{}
+      Logger.flush()
+    end) =~ "no match of right hand side value: [\"12\"]"
   end
 
   describe "LiveViewNative.Stylesheet sigil" do

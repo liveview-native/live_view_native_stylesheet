@@ -18,8 +18,17 @@ defmodule LiveViewNative.Stylesheet do
         class_or_list
         |> List.wrap()
         |> Enum.reduce(%{}, fn(class_name, class_map) ->
-          case class(class_name) do
-            {:unmatched, msg} -> class_map
+          try do
+            class(class_name)
+          rescue
+            e ->
+              require Logger
+              Logger.error(Exception.format(:error, e, __STACKTRACE__))
+              {:error, nil}
+          end
+          |> case do
+            {:error, _msg} -> class_map
+            {:unmatched, _msg} -> class_map
             rules ->
               Map.put(class_map, class_name, List.wrap(rules))
           end
