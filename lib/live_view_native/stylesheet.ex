@@ -13,7 +13,6 @@ defmodule LiveViewNative.Stylesheet do
       @format unquote(format)
       @before_compile LiveViewNative.Stylesheet
 
-      def compile_ast(class_or_list)
       def compile_ast(class_or_list) do
         class_or_list
         |> List.wrap()
