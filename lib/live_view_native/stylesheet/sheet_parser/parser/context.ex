@@ -1,4 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Context do
+  @moduledoc false
   defstruct [
     :file,
     :annotations,
