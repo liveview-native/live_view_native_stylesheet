@@ -1,4 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Parser do
+  @moduledoc false
   import NimbleParsec
   alias LiveViewNative.Stylesheet.SheetParser.Parser.Context
   alias LiveViewNative.Stylesheet.SheetParser.Parser.Error

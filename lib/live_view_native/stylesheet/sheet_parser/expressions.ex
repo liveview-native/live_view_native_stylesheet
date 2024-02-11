@@ -1,4 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Expressions do
+  @moduledoc false
   import NimbleParsec
   import LiveViewNative.Stylesheet.SheetParser.Parser
   import LiveViewNative.Stylesheet.SheetParser.Tokens

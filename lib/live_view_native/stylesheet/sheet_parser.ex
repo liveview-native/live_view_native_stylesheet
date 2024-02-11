@@ -1,4 +1,6 @@
 defmodule LiveViewNative.Stylesheet.SheetParser do
+  @moduledoc false
+
   alias LiveViewNative.Stylesheet.SheetParser.{Block, Parser}
 
   def parse(sheet, opts \\ []) do
