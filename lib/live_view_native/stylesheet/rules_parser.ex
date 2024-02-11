@@ -1,4 +1,6 @@
 defmodule LiveViewNative.Stylesheet.RulesParser do
+  @moduledoc false
+
   defmacro sigil_RULES({:<<>>, _meta, [rules]}, _modifier) do
     opts = [
       file: __CALLER__.file,
@@ -35,7 +37,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
           opts
           |> Keyword.put_new(:variable_context, Elixir)
           |> Keyword.update(:file, "", &Path.basename/1)
-          
+
         body
         |> String.replace("\r\n", "\n")
         |> parser.parse(opts)

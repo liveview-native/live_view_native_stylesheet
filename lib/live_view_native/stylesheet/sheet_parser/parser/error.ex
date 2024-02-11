@@ -1,4 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.Parser.Error do
+  @moduledoc false
   alias LiveViewNative.Stylesheet.SheetParser.Parser.Context
 
   defstruct([

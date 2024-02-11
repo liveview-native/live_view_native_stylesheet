@@ -1,4 +1,8 @@
 defmodule LiveViewNative.Stylesheet.Extractor do
+  @moduledoc false
+
+  # stolen/borrowed from Tailwind:
+  # https://github.com/tailwindlabs/tailwindcss/blob/27c67fef4331954cea3290c51fafb6944eae9926/src/lib/defaultExtractor.js
   @broad_match_global_regexp [
     ~r/(?:\['([^'\s]+[^<>"'`\s:\\])')/,
     ~r/(?:\["([^"\s]+[^<>"'`\s:\\])")/,

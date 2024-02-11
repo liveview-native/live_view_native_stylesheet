@@ -46,17 +46,4 @@ defmodule LiveViewNative.Stylesheet.Component do
       end
     end
   end
-
-  @doc """
-  Embed the CSRF token for LiveView as a tag
-  """
-  def csrf_token(assigns) do
-    csrf_token = Phoenix.Controller.get_csrf_token()
-
-    assigns = Map.put(assigns, :csrf_token, csrf_token)
-
-    ~LVN"""
-    <csrf-token value={@csrf_token} />
-    """
-  end
 end

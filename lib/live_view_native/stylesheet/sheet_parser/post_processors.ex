@@ -1,4 +1,5 @@
 defmodule LiveViewNative.Stylesheet.SheetParser.PostProcessors do
+  @moduledoc false
   import LiveViewNative.Stylesheet.SheetParser.Parser.Annotations
 
   def mark_line(rest, args, context, {line, _offset}, _byte_offset, name) do
