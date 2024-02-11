@@ -65,29 +65,31 @@ found within the body of each class from the sheet
 
 New stylesheets can be defined specific to each platform.
 
+Note that variable interpolation is done with `{ }` within the rules.
+
 ```elixir
 defmodule MySheet do
   use LiveViewNative.Stylesheet, :swiftui
 
   ~SHEET"""
   "color-" <> color_name do
-    color(to_ime(color_name))
+    color(.{color_name})
   end
   """
 
-  def class("color-"<>color_name, _target) do
+  def class("color-" <> color_name) do
     ~RULES"""
-    color(to_ime(color_name))
+    color(.{color_name})
     """
   end
 
-  def class("star-red", _target) do
+  def class("star-red") do
     ~RULES"""
     background(alignment: .leading){:star-red}
     """
   end
 
-  def class("star-blue", _target) do
+  def class("star-blue") do
     ~RULES"""
     background(alignment: .trailing){:star-blue}
     """
@@ -124,7 +126,7 @@ Some style/modifier values make more sense as attrs on the element itself. Custo
 support `attr(value)`:
 
 ```elixir
-def class("searchable", _target) do
+def class("searchable") do
   ~RULES"""
   searchable(placeholder: attr(placeholder))
   """
@@ -140,4 +142,3 @@ This will instruct the client to get the value from the element the class name m
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/live_view_native_stylesheet>.
-
