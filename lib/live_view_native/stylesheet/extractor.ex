@@ -33,28 +33,22 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     [broad_matches, inner_matches]
   end
 
-  def run(stylesheet_module) do
-    format = stylesheet_module.__native_opts__()[:format]
+  def paths(sheet_path, format) do
+    Application.get_env(:live_view_native_stylesheet, :content, [])
+    |> Keyword.get(format, [])
+    |> Enum.map(&convert_to_path(&1))
+    |> Enum.map(&Path.wildcard(&1))
+    |> List.flatten()
+    |> Enum.reject(&(File.dir?(&1) || &1 == sheet_path))
+  end
 
-    sheet_path = stylesheet_module.__sheet_path__()
-
-    files =
-      Application.get_env(:live_view_native_stylesheet, :content, [])
-      |> Keyword.get(format, [])
-      |> Enum.map(&convert_to_path(&1))
-      |> Enum.map(&Path.wildcard(&1))
-      |> List.flatten()
-      |> Enum.reject(&(File.dir?(&1) || &1 == sheet_path))
-
-    class_names =
-      files
-      |> Enum.map(&File.read!(&1))
-      |> Enum.map(&scan(&1))
-      |> List.flatten()
-      |> Enum.uniq()
-      |> Enum.reject(&rejector(&1))
-
-    {files, class_names}
+  def run(%{paths: paths}) do
+    paths
+    |> Enum.map(&File.read!(&1))
+    |> Enum.map(&scan(&1))
+    |> List.flatten()
+    |> Enum.uniq()
+    |> Enum.reject(&rejector(&1))
   end
 
   defp rejector(name) when is_binary(name) do

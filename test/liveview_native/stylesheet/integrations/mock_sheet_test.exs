@@ -1,14 +1,10 @@
 defmodule MockSheetTest do
   use ExUnit.Case
 
-  describe "embed_stylesheet" do
-    test "will generate stylesheet/1 with the correct styles" do
+  describe "stylesheet output" do
+    test "will compile the stylesheet into an asset file" do
       {styles, _} =
-        MockLayout.stylesheet(%{})
-        |> Phoenix.LiveViewTest.rendered_to_string()
-        |> Floki.parse_fragment!()
-        |> Floki.find("style")
-        |> Floki.text()
+        File.read!("priv/static/assets/mock_sheet.mock.styles")
         |> Code.eval_string()
 
       assert styles["color-blue"] == ["rule-2"]
