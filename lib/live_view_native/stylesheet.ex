@@ -21,7 +21,9 @@ defmodule LiveViewNative.Stylesheet do
           jetpack: [
             "lib/**/*jetpack*"
           ]
-        ]
+        ],
+        output: "priv/static/assets/"
+
   Because class names may be shared betweeen different formats you should try to ensure
   that the `content` pattern for that format is as targetd as possible.
 
@@ -33,7 +35,8 @@ defmodule LiveViewNative.Stylesheet do
           "lib/**/*swiftui*",
           {:my_custom_lib, "lib/**/*swiftui*"}
         ]
-      ]
+      ],
+      output: "priv/static/assets/"
 
   ## Optional configuration
 
@@ -80,6 +83,7 @@ defmodule LiveViewNative.Stylesheet do
 
       @format unquote(format)
       @before_compile LiveViewNative.Stylesheet
+      @after_verify LiveViewNative.Stylesheet
 
       def compile_ast(class_or_list) do
         class_or_list
@@ -117,16 +121,89 @@ defmodule LiveViewNative.Stylesheet do
     end
   end
 
+  def filename(module) do
+    format = module.__native_opts__()[:format]
+
+    module
+    |> Module.split()
+    |> List.last()
+    |> Macro.underscore()
+    |> Kernel.<>(".#{format}.styles")
+  end
+
+  def file_path(module) do
+    Application.get_env(:live_view_native_stylesheet, :output)
+    |> Path.join(filename(module))
+  end
+
   @doc false
   defmacro __before_compile__(env) do
-    sheet_path = Path.relative_to_cwd(env.file)
+    format = Module.get_attribute(env.module, :format)
+
+    paths =
+      env.file
+      |> Path.relative_to_cwd()
+      |> LiveViewNative.Stylesheet.Extractor.paths(format)
+
+    file_hash = :erlang.md5(paths)
 
     quote do
-      def __sheet_path__, do: unquote(sheet_path)
+      @stylesheet_paths unquote(paths)
+      @stylesheet_paths_hash unquote(file_hash)
+
+      for path <- unquote(paths) do
+        @external_resource path
+      end
 
       def class(unmatched) do
         {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)}"}
       end
+
+      def __stylesheet__ do
+        content =
+          Application.get_env(:live_view_native_stylesheet, :content, [])
+          |> Keyword.get(@format, [])
+
+        %{
+          paths: @stylesheet_paths,
+          format: @format,
+          config: %{
+            content: content,
+            output: LiveViewNative.Stylesheet.file_path(__MODULE__)
+          }
+        }
+      end
+
+      def __mix_recompile__? do
+        output_file_exists? =
+          __stylesheet__()
+          |> get_in([:config, :output])
+          |> File.exists?()
+
+        file_hash =
+          unquote(env.file)
+          |> Path.relative_to_cwd()
+          |> LiveViewNative.Stylesheet.Extractor.paths(@format)
+          |> :erlang.md5()
+
+        !(output_file_exists? && @stylesheet_paths_hash == file_hash)
+      end
     end
+  end
+
+  @doc false
+  def __after_verify__(module) do
+    compiled_sheet =
+      module.__stylesheet__()
+      |> LiveViewNative.Stylesheet.Extractor.run()
+      |> module.compile_string()
+
+    output_path = file_path(module)
+
+    output_path
+    |> Path.dirname()
+    |> File.mkdir_p!()
+
+    File.write(output_path, compiled_sheet)
   end
 end
