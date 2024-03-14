@@ -174,8 +174,6 @@ defmodule LiveViewNative.Stylesheet do
           |> Path.join(native_opts[:filename])
           |> File.exists?()
 
-        true
-
         file_hash =
           unquote(env.file)
           |> Path.relative_to_cwd()
