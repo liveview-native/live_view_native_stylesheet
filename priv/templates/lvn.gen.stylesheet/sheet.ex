@@ -1,4 +1,4 @@
-defmodule <%= context.web_module %>.Styles.<%= context.module_suffix %> do
+defmodule <%= inspect context.web_module %>.Styles.<%= inspect context.schema_module %>.<%= inspect   context.module_suffix %> do
   use LiveViewNative.Stylesheet, <%= inspect context.format %>
 
   # Add your styles here

@@ -23,12 +23,12 @@ defmodule Mix.Tasks.Lvn.Gen.Stylesheet do
       |> Enum.join("\n")
 
     Mix.raise("""
-    You must pass a valid format. Available formats:
+    You must pass a valid format and schema. Available formats:
     #{formats}
     """)
   end
 
-  def validate_args!([format | _] = args) do
+  def validate_args!([format, schema | []] = args) do
     cond do
       not Context.valid_format?(format) ->
         formats =
@@ -44,17 +44,24 @@ defmodule Mix.Tasks.Lvn.Gen.Stylesheet do
         Please see the documentation for how to register new LiveView Native plugins
         """)
 
+      not Mix.Phoenix.Schema.valid?(schema) ->
+        Mix.raise("Expected the schema, #{inspect(schema)}, to be a valid module name")
       true ->
         args
     end
   end
 
-  defp files_to_be_generated(%Context{format: format, context_app: context_app}) do
+  def validate_args!(args) do
+    Mix.raise("format and schema are required arguments. You passed #{Enum.join(args, ", ")}")
+  end
+
+  defp files_to_be_generated(%Context{format: format, schema_module: schema_module, context_app: context_app}) do
     web_prefix = Mix.Phoenix.web_path(context_app)
+    schema_name = Phoenix.Naming.underscore(schema_module)
 
     styles_path = Path.join(web_prefix, "styles")
 
-    [{:eex, "sheet.ex", Path.join(styles_path, "#{format}.ex")},]
+    [{:eex, "sheet.ex", Path.join(styles_path, "#{schema_name}.#{format}.ex")},]
   end
 
   defp copy_new_files(%Context{} = context, files) do

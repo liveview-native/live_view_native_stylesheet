@@ -113,11 +113,6 @@ defmodule LiveViewNative.Stylesheet do
         |> compile_ast()
         |> inspect(limit: :infinity, charlists: :as_list, printable_limit: :infinity, pretty: pretty)
       end
-
-
-      def __native_opts__ do
-        %{format: unquote(format)}
-      end
     end
   end
 
@@ -131,14 +126,11 @@ defmodule LiveViewNative.Stylesheet do
     |> Kernel.<>(".#{format}.styles")
   end
 
-  def file_path(module) do
-    Application.get_env(:live_view_native_stylesheet, :output)
-    |> Path.join(filename(module))
-  end
-
   @doc false
   defmacro __before_compile__(env) do
     format = Module.get_attribute(env.module, :format)
+
+    output = Application.get_env(:live_view_native_stylesheet, :output)
 
     paths =
       env.file
@@ -146,6 +138,19 @@ defmodule LiveViewNative.Stylesheet do
       |> LiveViewNative.Stylesheet.Extractor.paths(format)
 
     file_hash = :erlang.md5(paths)
+
+    content =
+      Application.get_env(:live_view_native_stylesheet, :content, [])
+      |> Keyword.get(format, [])
+
+    native_opts = %{
+      paths: paths,
+      format: format,
+      config: %{
+        content: content,
+        output: output
+      }
+    }
 
     quote do
       @stylesheet_paths unquote(paths)
@@ -159,26 +164,18 @@ defmodule LiveViewNative.Stylesheet do
         {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)}"}
       end
 
-      def __stylesheet__ do
-        content =
-          Application.get_env(:live_view_native_stylesheet, :content, [])
-          |> Keyword.get(@format, [])
-
-        %{
-          paths: @stylesheet_paths,
-          format: @format,
-          config: %{
-            content: content,
-            output: LiveViewNative.Stylesheet.file_path(__MODULE__)
-          }
-        }
+      def __native_opts__ do
+        unquote(Macro.escape(native_opts))
       end
 
       def __mix_recompile__? do
         output_file_exists? =
-          __stylesheet__()
+          __native_opts__()
           |> get_in([:config, :output])
+          |> Path.join(LiveViewNative.Stylesheet.filename(__MODULE__))
           |> File.exists?()
+
+        true
 
         file_hash =
           unquote(env.file)
@@ -193,17 +190,22 @@ defmodule LiveViewNative.Stylesheet do
 
   @doc false
   def __after_verify__(module) do
+    native_opts = module.__native_opts__()
+
     compiled_sheet =
-      module.__stylesheet__()
+      native_opts
       |> LiveViewNative.Stylesheet.Extractor.run()
       |> module.compile_string()
 
-    output_path = file_path(module)
+    file_path =
+      native_opts
+      |> get_in([:config, :output])
+      |> Path.join(filename(module))
 
-    output_path
+    file_path
     |> Path.dirname()
     |> File.mkdir_p!()
 
-    File.write(output_path, compiled_sheet)
+    File.write(file_path, compiled_sheet)
   end
 end
