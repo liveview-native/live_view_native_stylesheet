@@ -117,13 +117,10 @@ defmodule LiveViewNative.Stylesheet do
   end
 
   def filename(module) do
-    format = module.__native_opts__()[:format]
-
-    module
-    |> Module.split()
-    |> List.last()
-    |> Macro.underscore()
-    |> Kernel.<>(".#{format}.styles")
+    module.__native_opts__()[:filename]
+    |> String.split(".ex")
+    |> Enum.at(0)
+    |> Kernel.<>(".styles")
   end
 
   @doc false
@@ -137,6 +134,8 @@ defmodule LiveViewNative.Stylesheet do
       |> Path.relative_to_cwd()
       |> LiveViewNative.Stylesheet.Extractor.paths(format)
 
+    filename = Path.basename(env.file)
+
     file_hash = :erlang.md5(paths)
 
     content =
@@ -145,6 +144,7 @@ defmodule LiveViewNative.Stylesheet do
 
     native_opts = %{
       paths: paths,
+      filename: filename,
       format: format,
       config: %{
         content: content,

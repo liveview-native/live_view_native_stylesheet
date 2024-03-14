@@ -4,7 +4,7 @@ defmodule MockSheetTest do
   describe "stylesheet output" do
     test "will compile the stylesheet into an asset file" do
       {styles, _} =
-        File.read!("priv/static/assets/mock_sheet.mock.styles")
+        File.read!("priv/static/assets/mock_sheet.styles")
         |> Code.eval_string()
 
       assert styles["color-blue"] == ["rule-2"]
