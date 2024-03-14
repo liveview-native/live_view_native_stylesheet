@@ -116,13 +116,6 @@ defmodule LiveViewNative.Stylesheet do
     end
   end
 
-  def filename(module) do
-    module.__native_opts__()[:filename]
-    |> String.split(".ex")
-    |> Enum.at(0)
-    |> Kernel.<>(".styles")
-  end
-
   @doc false
   defmacro __before_compile__(env) do
     format = Module.get_attribute(env.module, :format)
@@ -134,7 +127,11 @@ defmodule LiveViewNative.Stylesheet do
       |> Path.relative_to_cwd()
       |> LiveViewNative.Stylesheet.Extractor.paths(format)
 
-    filename = Path.basename(env.file)
+    filename =
+      Path.basename(env.file)
+      |> String.split(".ex")
+      |> Enum.at(0)
+      |> Kernel.<>(".styles")
 
     file_hash = :erlang.md5(paths)
 
@@ -169,10 +166,12 @@ defmodule LiveViewNative.Stylesheet do
       end
 
       def __mix_recompile__? do
+        native_opts = __native_opts__()
+
         output_file_exists? =
-          __native_opts__()
+          native_opts
           |> get_in([:config, :output])
-          |> Path.join(LiveViewNative.Stylesheet.filename(__MODULE__))
+          |> Path.join(native_opts[:filename])
           |> File.exists?()
 
         true
@@ -200,7 +199,7 @@ defmodule LiveViewNative.Stylesheet do
     file_path =
       native_opts
       |> get_in([:config, :output])
-      |> Path.join(filename(module))
+      |> Path.join(native_opts[:filename])
 
     file_path
     |> Path.dirname()
