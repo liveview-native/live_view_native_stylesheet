@@ -56,13 +56,22 @@ defmodule LiveViewNative.Stylesheet do
   be defined *below* your definitions which gives your classes priority. Search order for a matching
   class is in the order of the imports defined.
 
-     defmodule MyAppWeb.Style.SwifUI do
-       use LiveViewNative.Stylesheet, :swiftui
+      defmodule MyAppWeb.Style.SwifUI do
+        use LiveViewNative.Stylesheet, :swiftui
 
-       @import LiveViewnative.SwiftUI.UtilityClasses
-     end
+        @import LiveViewnative.SwiftUI.UtilityClasses
+      end
 
-  Any sheet that is being imported will be flagged to prevent asset compilation and output.
+  To prevent child sheets from producing their own stylesheet when compiled set `@output` to `false`
+
+      defmodule MyStyleLib.SwiftUI do
+        use LiveViewNative.Stylesheet, :swiftui
+        @output false
+
+        ~SHEET"""
+          ...
+        """
+      end
   '''
 
   @doc ~S'''
@@ -147,25 +156,10 @@ defmodule LiveViewNative.Stylesheet do
   @doc false
   defmacro __before_compile__(env) do
     format = Module.get_attribute(env.module, :format)
-    export? = Module.get_attribute(env.module, :export, false)
+    output? = Module.get_attribute(env.module, :output, true)
     imports = Module.get_attribute(env.module, :import, [])
 
-    if export? do
-      native_opts = %{
-        imports: imports,
-        export: export?
-      }
-
-      quote do
-        def __native_opts__ do
-          unquote(Macro.escape(native_opts))
-        end
-
-        def class(unmatched) do
-          LiveViewNative.Stylesheet.unmatched_handler(unmatched, __native_opts__())
-        end
-      end
-    else
+    if output? do
       output = Application.get_env(:live_view_native_stylesheet, :output)
 
       paths =
@@ -187,6 +181,7 @@ defmodule LiveViewNative.Stylesheet do
 
       native_opts = %{
         imports: imports,
+        output?: output?,
         paths: paths,
         filename: filename,
         format: format,
@@ -230,6 +225,21 @@ defmodule LiveViewNative.Stylesheet do
           !(output_file_exists? && @stylesheet_paths_hash == file_hash)
         end
       end
+    else
+      native_opts = %{
+        imports: imports,
+        output?: output?
+      }
+
+      quote do
+        def __native_opts__ do
+          unquote(Macro.escape(native_opts))
+        end
+
+        def class(unmatched) do
+          LiveViewNative.Stylesheet.unmatched_handler(unmatched, __native_opts__())
+        end
+      end
     end
   end
 
@@ -237,7 +247,7 @@ defmodule LiveViewNative.Stylesheet do
   def __after_verify__(module) do
     native_opts = module.__native_opts__()
 
-    unless Map.get(native_opts, :export, false) do
+    if Map.get(native_opts, :output?, true) do
       compiled_sheet =
         native_opts
         |> LiveViewNative.Stylesheet.Extractor.run()

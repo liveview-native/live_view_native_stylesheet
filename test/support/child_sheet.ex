@@ -1,6 +1,6 @@
 defmodule ChildSheet do
   use LiveViewNative.Stylesheet, :mock
-  @export true
+  @output false
 
   ~SHEET"""
   "foobar" do
