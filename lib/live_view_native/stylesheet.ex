@@ -49,6 +49,20 @@ defmodule LiveViewNative.Stylesheet do
 
   With annotations tured on the native clients will have more information on how to report
   erors and warnings in its logger.
+
+  ## Importing other sheets
+
+  Class names defined in another sheet can be importd into your sheet. The classes will
+  be defined *below* your definitions which gives your classes priority. Search order for a matching
+  class is in the order of the imports defined.
+
+     defmodule MyAppWeb.Style.SwifUI do
+       use LiveViewNative.Stylesheet, :swiftui
+
+       @import LiveViewnative.SwiftUI.UtilityClasses
+     end
+
+  Any sheet that is being imported will be flagged to prevent asset compilation and output.
   '''
 
   @doc ~S'''
@@ -78,6 +92,8 @@ defmodule LiveViewNative.Stylesheet do
     })
 
     quote do
+      Module.register_attribute(__MODULE__, :import, accumulate: true)
+
       import LiveViewNative.Stylesheet.SheetParser, only: [sigil_SHEET: 2]
       import LiveViewNative.Stylesheet.RulesParser, only: [sigil_RULES: 2]
 
@@ -116,71 +132,103 @@ defmodule LiveViewNative.Stylesheet do
     end
   end
 
+  def unmatched_handler(unmatched, %{imports: imports}) do
+    result = {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)}"}
+
+    Enum.reduce_while(imports, result, fn(sheet, result) ->
+      sheet.class(unmatched)
+      |> case do
+        {:unmatched, _msg} -> {:cont, result}
+        result -> {:halt, result}
+      end
+    end)
+  end
+
   @doc false
   defmacro __before_compile__(env) do
     format = Module.get_attribute(env.module, :format)
+    export? = Module.get_attribute(env.module, :export, false)
+    imports = Module.get_attribute(env.module, :import, [])
 
-    output = Application.get_env(:live_view_native_stylesheet, :output)
-
-    paths =
-      env.file
-      |> Path.relative_to_cwd()
-      |> LiveViewNative.Stylesheet.Extractor.paths(format)
-
-    filename =
-      Path.basename(env.file)
-      |> String.split(".ex")
-      |> Enum.at(0)
-      |> Kernel.<>(".styles")
-
-    file_hash = :erlang.md5(paths)
-
-    content =
-      Application.get_env(:live_view_native_stylesheet, :content, [])
-      |> Keyword.get(format, [])
-
-    native_opts = %{
-      paths: paths,
-      filename: filename,
-      format: format,
-      config: %{
-        content: content,
-        output: output
+    if export? do
+      native_opts = %{
+        imports: imports,
+        export: export?
       }
-    }
 
-    quote do
-      @stylesheet_paths unquote(paths)
-      @stylesheet_paths_hash unquote(file_hash)
+      quote do
+        def __native_opts__ do
+          unquote(Macro.escape(native_opts))
+        end
 
-      for path <- unquote(paths) do
-        @external_resource path
+        def class(unmatched) do
+          LiveViewNative.Stylesheet.unmatched_handler(unmatched, __native_opts__())
+        end
       end
+    else
+      output = Application.get_env(:live_view_native_stylesheet, :output)
 
-      def class(unmatched) do
-        {:unmatched, "Stylesheet warning: Could not match on class: #{inspect(unmatched)}"}
-      end
+      paths =
+        env.file
+        |> Path.relative_to_cwd()
+        |> LiveViewNative.Stylesheet.Extractor.paths(format)
 
-      def __native_opts__ do
-        unquote(Macro.escape(native_opts))
-      end
+      filename =
+        Path.basename(env.file)
+        |> String.split(".ex")
+        |> Enum.at(0)
+        |> Kernel.<>(".styles")
 
-      def __mix_recompile__? do
-        native_opts = __native_opts__()
+      file_hash = :erlang.md5(paths)
 
-        output_file_exists? =
-          native_opts
-          |> get_in([:config, :output])
-          |> Path.join(native_opts[:filename])
-          |> File.exists?()
+      content =
+        Application.get_env(:live_view_native_stylesheet, :content, [])
+        |> Keyword.get(format, [])
 
-        file_hash =
-          unquote(env.file)
-          |> Path.relative_to_cwd()
-          |> LiveViewNative.Stylesheet.Extractor.paths(@format)
-          |> :erlang.md5()
+      native_opts = %{
+        imports: imports,
+        paths: paths,
+        filename: filename,
+        format: format,
+        config: %{
+          content: content,
+          output: output
+        }
+      }
 
-        !(output_file_exists? && @stylesheet_paths_hash == file_hash)
+      quote do
+        @stylesheet_paths unquote(paths)
+        @stylesheet_paths_hash unquote(file_hash)
+
+        for path <- unquote(paths) do
+          @external_resource path
+        end
+
+        def __native_opts__ do
+          unquote(Macro.escape(native_opts))
+        end
+
+        def class(unmatched) do
+          LiveViewNative.Stylesheet.unmatched_handler(unmatched, __native_opts__())
+        end
+
+        def __mix_recompile__? do
+          native_opts = __native_opts__()
+
+          output_file_exists? =
+            native_opts
+            |> get_in([:config, :output])
+            |> Path.join(native_opts[:filename])
+            |> File.exists?()
+
+          file_hash =
+            unquote(env.file)
+            |> Path.relative_to_cwd()
+            |> LiveViewNative.Stylesheet.Extractor.paths(@format)
+            |> :erlang.md5()
+
+          !(output_file_exists? && @stylesheet_paths_hash == file_hash)
+        end
       end
     end
   end
@@ -189,20 +237,22 @@ defmodule LiveViewNative.Stylesheet do
   def __after_verify__(module) do
     native_opts = module.__native_opts__()
 
-    compiled_sheet =
-      native_opts
-      |> LiveViewNative.Stylesheet.Extractor.run()
-      |> module.compile_string()
+    unless Map.get(native_opts, :export, false) do
+      compiled_sheet =
+        native_opts
+        |> LiveViewNative.Stylesheet.Extractor.run()
+        |> module.compile_string()
 
-    file_path =
-      native_opts
-      |> get_in([:config, :output])
-      |> Path.join(native_opts[:filename])
+      file_path =
+        native_opts
+        |> get_in([:config, :output])
+        |> Path.join(native_opts[:filename])
 
-    file_path
-    |> Path.dirname()
-    |> File.mkdir_p!()
+      file_path
+      |> Path.dirname()
+      |> File.mkdir_p!()
 
-    File.write(file_path, compiled_sheet)
+      File.write(file_path, compiled_sheet)
+    end
   end
 end
