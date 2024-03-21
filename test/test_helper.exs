@@ -1,7 +1,7 @@
 # For mix tests
 Mix.shell(Mix.Shell.Process)
 
-[MockSheet, EmptySheet]
+[MockSheet, EmptySheet, ParentSheet, ChildSheet]
 |> Enum.each(&(LiveViewNative.Stylesheet.__after_verify__(&1)))
 
 ExUnit.after_suite(fn(_) ->
