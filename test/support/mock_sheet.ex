@@ -16,6 +16,10 @@ defmodule MockSheet do
   "rule-containing-end" do
     rule-end
   end
+
+  "nil" do
+    {nil}
+  end
   """
 
   def class("color-three") do

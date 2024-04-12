@@ -30,6 +30,12 @@ defmodule LiveViewNative.StylesheetTest do
     assert output == %{"custom-789-123" => ["rule-789", "rule-123"]}
   end
 
+  test "will not convert `nil` to an empty string during interpolation" do
+    output = MockSheet.compile_ast("nil")
+
+    assert output == %{"nil" => ["nil"]}
+  end
+
   test "will capture and log any raises within `class/1` when compiling stylesheet" do
     assert capture_io(:user, fn ->
       assert MockSheet.compile_ast(["raise-12"]) == %{}

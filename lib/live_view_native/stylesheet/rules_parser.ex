@@ -13,12 +13,29 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
       rules
       |> String.replace("{", "<%=")
       |> String.replace("}", "%>")
-      |> EEx.compile_string()
+      |> precompile_string()
 
     quote do
       LiveViewNative.Stylesheet.RulesParser.parse(unquote(compiled_rules), @format, unquote(opts))
     end
   end
+
+  def precompile_string(rules) do
+    {:ok, tokens} = EEx.tokenize(rules, [])
+
+    tokens = Enum.map(tokens, &rewrite_expr(&1))
+
+    EEx.Compiler.compile(tokens, rules, [])
+  end
+
+  defp rewrite_expr({:expr, mark, chars, meta}) do
+    {:expr, mark, ~c"LiveViewNative.Stylesheet.RulesParser.handle_interpolation(" ++ chars ++ ~c")", meta}
+  end
+
+  defp rewrite_expr(expr), do: expr
+
+  def handle_interpolation(nil), do: "nil"
+  def handle_interpolation(other), do: other
 
   def fetch(format) do
     with {:ok, plugin} <- LiveViewNative.fetch_plugin(format),
