@@ -33,7 +33,11 @@ defmodule LiveViewNative.Stylesheet do
       content: [
         swifti: [
           "lib/**/*swiftui*",
-          {:my_custom_lib, "lib/**/*swiftui*"}
+          {:my_custom_lib, "lib/**/*swiftui*"},
+          {:other_lib, [
+            "lib/**/*swiftui*",
+            "priv/**/*swiftui*"
+          ]}
         ]
       ],
       output: "priv/static/assets/"
