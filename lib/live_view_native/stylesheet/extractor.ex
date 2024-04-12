@@ -37,6 +37,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     Application.get_env(:live_view_native_stylesheet, :content, [])
     |> Keyword.get(format, [])
     |> Enum.map(&convert_to_path(&1))
+    |> List.flatten()
     |> Enum.map(&Path.wildcard(&1))
     |> List.flatten()
     |> Enum.reject(&(File.dir?(&1) || &1 == sheet_path))
@@ -59,8 +60,11 @@ defmodule LiveViewNative.Stylesheet.Extractor do
   defp rejector(_other), do: false
 
   defp convert_to_path(pattern) when is_binary(pattern), do: pattern
-  defp convert_to_path({otp_app, pattern}) do
+  defp convert_to_path({otp_app, pattern}) when is_binary(pattern) do
     Mix.Project.deps_paths[otp_app]
     |> Path.join(pattern)
+  end
+  defp convert_to_path({otp_app, patterns}) when is_list(patterns) do
+    Enum.map(patterns, &(convert_to_path({otp_app, &1})))
   end
 end
