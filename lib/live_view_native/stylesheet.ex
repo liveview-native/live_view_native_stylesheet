@@ -66,11 +66,11 @@ defmodule LiveViewNative.Stylesheet do
         @import LiveViewnative.SwiftUI.UtilityClasses
       end
 
-  To prevent child sheets from producing their own stylesheet when compiled set `@output` to `false`
+  To prevent child sheets from producing their own stylesheet when compiled set `@export` to `true`
 
       defmodule MyStyleLib.SwiftUI do
         use LiveViewNative.Stylesheet, :swiftui
-        @output false
+        @export true
 
         ~SHEET"""
           ...
@@ -160,10 +160,25 @@ defmodule LiveViewNative.Stylesheet do
   @doc false
   defmacro __before_compile__(env) do
     format = Module.get_attribute(env.module, :format)
-    output? = Module.get_attribute(env.module, :output, true)
+    export? = Module.get_attribute(env.module, :export, false)
     imports = Module.get_attribute(env.module, :import, [])
 
-    if output? do
+    if export? do
+      native_opts = %{
+        imports: imports,
+        export?: export?
+      }
+
+      quote do
+        def __native_opts__ do
+          unquote(Macro.escape(native_opts))
+        end
+
+        def class(unmatched) do
+          LiveViewNative.Stylesheet.unmatched_handler(unmatched, __native_opts__())
+        end
+      end
+    else
       output = Application.get_env(:live_view_native_stylesheet, :output)
 
       paths =
@@ -185,7 +200,7 @@ defmodule LiveViewNative.Stylesheet do
 
       native_opts = %{
         imports: imports,
-        output?: output?,
+        export?: export?,
         paths: paths,
         filename: filename,
         format: format,
@@ -229,21 +244,6 @@ defmodule LiveViewNative.Stylesheet do
           !(output_file_exists? && @stylesheet_paths_hash == file_hash)
         end
       end
-    else
-      native_opts = %{
-        imports: imports,
-        output?: output?
-      }
-
-      quote do
-        def __native_opts__ do
-          unquote(Macro.escape(native_opts))
-        end
-
-        def class(unmatched) do
-          LiveViewNative.Stylesheet.unmatched_handler(unmatched, __native_opts__())
-        end
-      end
     end
   end
 
@@ -251,7 +251,7 @@ defmodule LiveViewNative.Stylesheet do
   def __after_verify__(module) do
     native_opts = module.__native_opts__()
 
-    if Map.get(native_opts, :output?, true) do
+    unless Map.get(native_opts, :export?, false) do
       compiled_sheet =
         native_opts
         |> LiveViewNative.Stylesheet.Extractor.run()
