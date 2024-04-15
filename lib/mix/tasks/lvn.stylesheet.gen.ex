@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Lvn.Gen.Stylesheet do
+defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
   alias Mix.LiveViewNative.Context
 
   def run(args) do
