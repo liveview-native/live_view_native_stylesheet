@@ -1,4 +1,9 @@
 defmodule LiveViewNative.Stylesheet do
+  require Mix.LiveViewNative.Context
+  import Mix.LiveViewNative.Context, only: [
+    compile_string: 1,
+    last?: 2
+  ]
   @moduledoc ~S'''
   Add LiveView Native Stylesheet to your app
 
@@ -229,19 +234,24 @@ defmodule LiveViewNative.Stylesheet do
         def __mix_recompile__? do
           native_opts = __native_opts__()
 
-          output_file_exists? =
-            native_opts
-            |> get_in([:config, :output])
-            |> Path.join(native_opts[:filename])
-            |> File.exists?()
+          output = get_in(native_opts, [:config, :output])
 
-          file_hash =
-            unquote(env.file)
-            |> Path.relative_to_cwd()
-            |> LiveViewNative.Stylesheet.Extractor.paths(@format)
-            |> :erlang.md5()
+          if output do
+            output_file_exists? =
+              output
+              |> Path.join(native_opts[:filename])
+              |> File.exists?()
 
-          !(output_file_exists? && @stylesheet_paths_hash == file_hash)
+            file_hash =
+              unquote(env.file)
+              |> Path.relative_to_cwd()
+              |> LiveViewNative.Stylesheet.Extractor.paths(@format)
+              |> :erlang.md5()
+
+            !(output_file_exists? && @stylesheet_paths_hash == file_hash)
+          else
+            false
+          end
         end
       end
     end
@@ -251,22 +261,54 @@ defmodule LiveViewNative.Stylesheet do
   def __after_verify__(module) do
     native_opts = module.__native_opts__()
 
-    unless Map.get(native_opts, :export?, false) do
-      compiled_sheet =
-        native_opts
-        |> LiveViewNative.Stylesheet.Extractor.run()
-        |> module.compile_string()
+    output = get_in(native_opts, [:config, :output])
+    export? = Map.get(native_opts, :export?, false)
 
-      file_path =
-        native_opts
-        |> get_in([:config, :output])
-        |> Path.join(native_opts[:filename])
+    cond do
+      output && !export? ->
+        compiled_sheet =
+          native_opts
+          |> LiveViewNative.Stylesheet.Extractor.run()
+          |> module.compile_string()
 
-      file_path
-      |> Path.dirname()
-      |> File.mkdir_p!()
+        file_path = Path.join(output, native_opts[:filename])
 
-      File.write(file_path, compiled_sheet)
+        file_path
+        |> Path.dirname()
+        |> File.mkdir_p!()
+
+        File.write(file_path, compiled_sheet)
+
+      !output && !export? ->
+        plugins =
+          LiveViewNative.plugins()
+          |> Map.values()
+
+        plugins? = length(plugins) > 0
+
+        """
+        `live_view_native_stylesheet` does not have an `output` directory configured.
+        Add one:
+
+        \e[93;1m# config/config.exs\e[0m
+
+        \e[91;1mLVN - Required\e[0m
+        # You must configure LiveView Native Stylesheets
+        # on which file path patterns class names should be extracted from
+        \e[32;1mconfig :live_view_native_stylesheet,
+          content: [<%= if plugins? do %><%= for plugin <- plugins do %>
+            <%= plugin.format %>: [
+              "lib/**/*<%= plugin.format %>*"
+            ]<%= unless last?(plugins, plugin) do %>,<% end %><% end %><% else %>
+            # swiftui: ["lib/**/*swiftui*"]<% end %>
+          ],
+          output: "priv/static/assets"\e[0m
+        """
+        |> Mix.LiveViewNative.Context.compile_string()
+        |> IO.warn()
+      true ->
+        :ok
     end
+
   end
 end
