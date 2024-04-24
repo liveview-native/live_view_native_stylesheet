@@ -1,10 +1,27 @@
 defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
+  use Mix.Task
+
   alias Mix.LiveViewNative.Context
   import Mix.LiveViewNative.Context, only: [
     compile_string: 1,
     last?: 2
   ]
 
+  @shortdoc "Generates a new format specific stylesheet"
+
+  @moduledoc """
+  #{@shortdoc}
+
+      $ mix lvn.stylesheet gen.live swiftui App
+
+  ## Options
+
+  * `--no-copy` - don't copy the styelsheet module into your application
+  * `--no-info` - don't print configuration info
+  """
+
+  @impl true
+  @doc false
   def run(args) do
     {opts, _parsed, _invalid} = OptionParser.parse(args, switches: switches())
 
@@ -22,11 +39,10 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
     end
   end
 
-  def print_shell_instructions(opts) do
+  defp print_shell_instructions(opts) do
     print_config()
     print_dev(opts)
   end
-
 
   defp print_config() do
     plugins =
@@ -60,7 +76,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
     |> Mix.shell().info()
   end
 
-  def print_dev(opts) do
+  defp print_dev(opts) do
     context_app = opts[:context_app] || Mix.Phoenix.context_app()
     base_module = Module.concat([Mix.Phoenix.context_base(context_app)])
     web_module = Mix.Phoenix.web_module(base_module)
@@ -102,6 +118,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
     context
   end
 
+  @doc false
   def switches, do: [
     context_app: :string,
     web: :string,
@@ -109,6 +126,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
     copy: :boolean
   ]
 
+  @doc false
   def validate_args!([]) do
     formats =
       LiveViewNative.available_formats()
