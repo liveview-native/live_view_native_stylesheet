@@ -54,7 +54,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
     """
     \e[93;1m# config/config.exs\e[0m
 
-    \e[91;1mLVN - Required\e[0m
+    # \e[91;1mLVN - Required\e[0m
     # You must configure LiveView Native Stylesheets
     # on which file path patterns class names should be extracted from
     \e[32;1mconfig :live_view_native_stylesheet,
