@@ -106,7 +106,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
         ]
 
       # \e[36mLVN - Optional\e[0m
-      # Adds dev mode stylesheet annotations for client IDEs and expands stylsheets visually
+      # Adds dev mode stylesheet annotations for client IDEs and expands stylesheets visually
       \e[32;1mconfig :live_view_native_stylesheet,
         annotations: true,
         pretty: true\e[0m
