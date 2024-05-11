@@ -53,7 +53,7 @@ defmodule LiveViewNative.Stylesheet.RulesParser do
         opts =
           opts
           |> Keyword.put_new(:variable_context, Elixir)
-          |> Keyword.update(:file, "", &Path.basename/1)
+          |> Keyword.update(:file, "nofile", &Path.basename/1)
 
         body
         |> String.replace("\r\n", "\n")

@@ -34,6 +34,14 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       assert result == ["rule-1", "rule-2"]
     end
 
+    test "empty list when no rules" do
+      rules = ""
+
+      result = RulesParser.parse(rules, :mock)
+
+      assert result == []
+    end
+
     test "will raise when parser is not found" do
       assert_raise RuntimeError, "No parser found for `:other`", fn ->
         RulesParser.parse("", :other)
@@ -48,8 +56,8 @@ defmodule LiveViewNative.Stylesheet.RulesParserTest do
       result = RulesParser.parse(rules, :mock, file: @file_path, line: 1, module: @module)
 
       assert result == [
-               {:foobar, [file: @file_name, line: 1, module: @module], [1, 2, 3]}
-             ]
+        {:foobar, [file: @file_name, line: 1, module: @module], [1, 2, 3]}
+      ]
     end
   end
 end

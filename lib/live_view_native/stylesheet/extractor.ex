@@ -1,6 +1,8 @@
 defmodule LiveViewNative.Stylesheet.Extractor do
   @moduledoc false
 
+  alias Phoenix.LiveView.Tokenizer
+
   # stolen/borrowed from Tailwind:
   # https://github.com/tailwindlabs/tailwindcss/blob/27c67fef4331954cea3290c51fafb6944eae9926/src/lib/defaultExtractor.js
   @broad_match_global_regexp [
@@ -44,12 +46,112 @@ defmodule LiveViewNative.Stylesheet.Extractor do
   end
 
   def run(%{paths: paths}) do
-    paths
-    |> Enum.map(&File.read!(&1))
-    |> Enum.map(&scan(&1))
-    |> List.flatten()
-    |> Enum.uniq()
-    |> Enum.reject(&rejector(&1))
+    files =
+      paths
+      |> Enum.map(&({File.read!(&1), &1}))
+
+    class_names =
+      files
+      |> Enum.map(&scan(elem(&1, 0)))
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Enum.reject(&rejector(&1))
+
+    styles =
+      files
+      |> Enum.reduce([], fn({content, path}, acc) ->
+        cond do
+          path =~ ~r/\.neex$/ ->
+            acc ++ parse_style(content, path)
+          path =~ ~r/\.ex$/ ->
+            acc ++
+              (content
+              |> extract_templates()
+              |> Enum.map(&parse_style(elem(&1, 0), path, elem(&1, 1))))
+          true ->
+            acc
+        end
+      end)
+      |> List.flatten()
+      |> Enum.uniq()
+
+    {class_names, styles}
+  end
+
+  defp extract_templates(content) do
+    case Code.string_to_quoted(content) do
+      {:ok, quoted} ->
+        Macro.prewalk(quoted, [], fn
+          {:sigil_LVN, _, [{:<<>>, annotations, [template]}, []]} =  node, acc -> {node, [{template, annotations} | acc]}
+          node, acc -> {node, acc}
+        end)
+      _ -> nil
+    end
+    |> elem(1)
+  end
+
+  def parse_style(template, path, opts \\ [])
+  def parse_style(nil, _path, _opts), do: []
+  def parse_style(template, path, opts) do
+    indentation = Keyword.get(opts, :indentation, 0)
+    state = Tokenizer.init(indentation, path, template, LiveViewNative.TagEngine)
+
+    {tokens, _context} = Tokenizer.tokenize(template, [], [], :text, state)
+
+    tokens
+    |> Enum.reduce([], fn
+      {:tag, _, attributes, _}, acc -> parse_style_from_attributes(attributes) ++ acc
+      _other, acc -> acc
+    end)
+    |> Enum.map(&({&1, path}))
+  end
+
+  defp parse_style_from_attributes([]), do: []
+  defp parse_style_from_attributes(attributes) do
+    Enum.reduce(attributes, [], fn
+      {"style", {:string, value, _,}, _}, acc ->
+        acc ++ decode_styles(value)
+      {"style", {:expr, value, _}, _}, acc ->
+        acc ++ (
+          value
+          |> Code.eval_string()
+          |> elem(0)
+          |> List.wrap())
+      _attr, acc -> acc
+    end)
+  end
+
+  def decode_styles(value) do
+    value
+    |> String.to_charlist()
+    |> tokenize_styles([], [])
+  end
+
+  defp tokenize_styles([], buffer, acc),
+    do: append_buffer(buffer, acc)
+
+  defp tokenize_styles(~c"&quot;" ++ t, buffer, acc) do
+    tokenize_styles(t, [~c"\"" | buffer], acc)
+  end
+
+  defp tokenize_styles(~c";" ++ t, buffer, acc) do
+    tokenize_styles(t, [], append_buffer(buffer, acc))
+  end
+
+  defp tokenize_styles([char | t], buffer, acc) do
+    tokenize_styles(t, [char | buffer], acc)
+  end
+
+  defp append_buffer([], acc), do: acc
+  defp append_buffer(buffer, acc) do
+    buffer
+    |> Enum.reverse()
+    |> List.to_string()
+    |> String.trim()
+    |> case do
+      "" -> acc
+      value -> acc ++ [value]
+    end
   end
 
   defp rejector(name) when is_binary(name) do

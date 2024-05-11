@@ -1,0 +1,10 @@
+<Text style="t-string-1"/>
+<Text style="t-string-2;t-string-3"/>
+<Text style="t-string-1;;; ;"/>
+<Text style={"t-bracket-1"}/>
+<Text style={"t-bracket-\"2\""}/>
+<Text style={[
+"t-bracket-3",
+~S(t-bracket-4)
+]}/>
+style="t-illegal"
