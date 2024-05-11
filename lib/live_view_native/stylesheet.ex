@@ -1,7 +1,6 @@
 defmodule LiveViewNative.Stylesheet do
   require Mix.LiveViewNative.Context
   import Mix.LiveViewNative.Context, only: [
-    compile_string: 1,
     last?: 2
   ]
   @moduledoc ~S'''
@@ -119,34 +118,55 @@ defmodule LiveViewNative.Stylesheet do
       @before_compile LiveViewNative.Stylesheet
       @after_verify LiveViewNative.Stylesheet
 
-      def compile_ast(class_or_list) do
-        class_or_list
-        |> List.wrap()
-        |> Enum.reduce(%{}, fn(class_name, class_map) ->
-          try do
-            class(class_name)
-          rescue
-            e ->
-              require Logger
-              Logger.error(Exception.format(:error, e, __STACKTRACE__))
-              {:error, nil}
-          end
-          |> case do
-            {:error, _msg} -> class_map
-            {:unmatched, _msg} -> class_map
-            rules ->
-              Map.put(class_map, class_name, List.wrap(rules))
-          end
-        end)
+      def compile_ast({class_or_list, style_list}) do
+        class_map =
+          class_or_list
+          |> List.wrap()
+          |> Enum.reduce(%{}, fn(class_name, class_map) ->
+            try do
+              class(class_name)
+            rescue
+              e ->
+                require Logger
+                Logger.error(Exception.format(:error, e, __STACKTRACE__))
+                {:error, nil}
+            end
+            |> case do
+              {:error, _msg} -> class_map
+              {:unmatched, _msg} -> class_map
+              rules ->
+                Map.put(class_map, class_name, List.wrap(rules))
+            end
+          end)
+
+        style_map =
+          style_list
+          |> List.flatten()
+          |> Enum.into(%{}, fn({style, path}) ->
+            {:safe, encoded_style} = Phoenix.HTML.html_escape(style)
+            style_ast = LiveViewNative.Stylesheet.RulesParser.parse(style, @format, file: path)
+            {IO.iodata_to_binary(encoded_style), [style]}
+          end)
+
+        Map.merge(class_map, style_map)
       end
 
-      def compile_string(class_or_list) do
+      def compile_ast(class_or_list) do
+        compile_ast({class_or_list, []})
+      end
+
+      def compile_string({class_or_list, style_list}) do
         pretty = Application.get_env(:live_view_native_stylesheet, :pretty, false)
 
-        class_or_list
+        {class_or_list, style_list}
         |> compile_ast()
         |> inspect(limit: :infinity, charlists: :as_list, printable_limit: :infinity, pretty: pretty)
       end
+
+      def compile_string(class_or_list) do
+        compile_string({class_or_list, []})
+      end
+
     end
   end
 
