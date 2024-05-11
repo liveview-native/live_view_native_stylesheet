@@ -1,0 +1,8 @@
+<!--
+This template is used for regression
+testing with our tokenizer
+-->
+
+<%= foobar do %>
+<Text>Hello</Text>
+<% end %>

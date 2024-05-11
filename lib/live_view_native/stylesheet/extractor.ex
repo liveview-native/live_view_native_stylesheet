@@ -93,10 +93,23 @@ defmodule LiveViewNative.Stylesheet.Extractor do
   def parse_style(template, path, opts \\ [])
   def parse_style(nil, _path, _opts), do: []
   def parse_style(template, path, opts) do
+    {:ok, eex_nodes} = EEx.tokenize(template)
+
     indentation = Keyword.get(opts, :indentation, 0)
     state = Tokenizer.init(indentation, path, template, LiveViewNative.TagEngine)
 
-    {tokens, _context} = Tokenizer.tokenize(template, [], [], :text, state)
+    tokens =
+      Enum.reduce(eex_nodes, [], fn
+        {:text, tokens, meta}, tokens_acc ->
+          text = List.to_string(tokens)
+          meta = [line: meta.line, column: meta.column]
+
+          {tokens, _context} = Tokenizer.tokenize(text, meta, [], :text, state)
+
+          tokens_acc ++ tokens
+
+        _eex_node, tokens_acc -> tokens_acc
+      end)
 
     tokens
     |> Enum.reduce([], fn
