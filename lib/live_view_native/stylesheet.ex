@@ -143,9 +143,9 @@ defmodule LiveViewNative.Stylesheet do
           style_list
           |> List.flatten()
           |> Enum.into(%{}, fn({style, path}) ->
-            {:safe, encoded_style} = Phoenix.HTML.html_escape(style)
+            # {:safe, encoded_style} = Phoenix.HTML.html_escape(style)
             style_ast = LiveViewNative.Stylesheet.RulesParser.parse(style, @format, file: path)
-            {IO.iodata_to_binary(encoded_style), List.wrap(style_ast)}
+            {style, List.wrap(style_ast)}
           end)
 
         Map.merge(class_map, style_map)
