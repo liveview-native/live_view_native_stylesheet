@@ -113,7 +113,8 @@ defmodule LiveViewNative.Stylesheet.Extractor do
 
     tokens
     |> Enum.reduce([], fn
-      {:tag, _, attributes, _}, acc -> parse_style_from_attributes(attributes) ++ acc
+      {type, _, attributes, _}, acc when type in [:tag, :slot, :local_component] ->
+        parse_style_from_attributes(attributes) ++ acc
       _other, acc -> acc
     end)
     |> Enum.map(&({&1, path}))

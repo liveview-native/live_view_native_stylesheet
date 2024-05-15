@@ -28,6 +28,9 @@ defmodule MockSheetTest do
       assert styles["c-bracket-3"] == ["c-bracket-3"]
       assert styles["c-bracket-4"] == ["c-bracket-4"]
 
+      assert styles["c-slot-string-1"] == ["c-slot-string-1"]
+      assert styles["c-local-component-string-1"] == ["c-local-component-string-1"]
+
       refute Map.has_key?(styles, "c-illegal")
     end
 
@@ -44,6 +47,9 @@ defmodule MockSheetTest do
       assert styles["t-bracket-\"2\""] == ["t-bracket-\"2\""]
       assert styles["t-bracket-3"] == ["t-bracket-3"]
       assert styles["t-bracket-4"] == ["t-bracket-4"]
+
+      assert styles["t-slot-string-1"] == ["t-slot-string-1"]
+      assert styles["t-local-component-string-1"] == ["t-local-component-string-1"]
 
       refute Map.has_key?(styles, "t-illegal")
     end
