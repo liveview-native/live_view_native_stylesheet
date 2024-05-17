@@ -1,5 +1,6 @@
 defmodule LiveViewNative.Stylesheet.Extractor do
   @moduledoc false
+  require Logger
 
   alias Phoenix.LiveView.Tokenizer
 
@@ -114,14 +115,14 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     tokens
     |> Enum.reduce([], fn
       {type, _, attributes, _}, acc when type in [:tag, :slot, :local_component] ->
-        parse_style_from_attributes(attributes) ++ acc
+        parse_style_from_attributes(attributes, path) ++ acc
       _other, acc -> acc
     end)
     |> Enum.map(&({&1, path}))
   end
 
-  defp parse_style_from_attributes([]), do: []
-  defp parse_style_from_attributes(attributes) do
+  defp parse_style_from_attributes([], _path), do: []
+  defp parse_style_from_attributes(attributes, path) do
     Enum.reduce(attributes, [], fn
       {"style", {:string, value, _,}, _}, acc ->
         acc ++ decode_styles(value)
@@ -134,6 +135,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
             |> List.wrap())
         rescue
           _e ->
+            Logger.warning("attempted to use an @ variable in `style` attribute, not allowed\n#{path}")
             acc
         end
       _attr, acc -> acc

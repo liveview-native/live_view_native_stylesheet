@@ -1,5 +1,7 @@
 import Config
 
+config :logger, level: :error
+
 config :live_view_native, :plugins, [
   MockClient
 ]
