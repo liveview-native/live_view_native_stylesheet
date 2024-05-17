@@ -126,11 +126,16 @@ defmodule LiveViewNative.Stylesheet.Extractor do
       {"style", {:string, value, _,}, _}, acc ->
         acc ++ decode_styles(value)
       {"style", {:expr, value, _}, _}, acc ->
-        acc ++ (
-          value
-          |> Code.eval_string()
-          |> elem(0)
-          |> List.wrap())
+        try do
+          acc ++ (
+            value
+            |> Code.eval_string(assigns: %{})
+            |> elem(0)
+            |> List.wrap())
+        rescue
+          _e ->
+            acc
+        end
       _attr, acc -> acc
     end)
   end

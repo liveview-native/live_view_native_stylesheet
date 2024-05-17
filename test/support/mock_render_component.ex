@@ -23,6 +23,7 @@ defmodule MockRenderComponent do
     <.image style="c-local-component-string-1">
       <:success style="c-slot-string-1"/>
     </.image>
+    <Text style={@style}/>
     """
   end
 

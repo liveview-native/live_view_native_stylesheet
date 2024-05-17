@@ -11,3 +11,4 @@ style="t-illegal"
 <.image style="t-local-component-string-1">
   <:success style="t-slot-string-1"/>
 </.image>
+<Text style={[@style]}/>
