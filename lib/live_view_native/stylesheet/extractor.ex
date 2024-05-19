@@ -132,7 +132,9 @@ defmodule LiveViewNative.Stylesheet.Extractor do
             value
             |> Code.eval_string(assigns: %{})
             |> elem(0)
-            |> List.wrap())
+            |> List.wrap()
+            |> Enum.map(&decode_styles(&1))
+            |> List.flatten())
         rescue
           _e ->
             Logger.warning("attempted to use an @ variable in `style` attribute, not allowed\n#{path}")
