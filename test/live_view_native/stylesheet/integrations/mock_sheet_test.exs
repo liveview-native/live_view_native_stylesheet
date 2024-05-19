@@ -47,6 +47,8 @@ defmodule MockSheetTest do
       assert styles["t-bracket-\"2\""] == ["t-bracket-\"2\""]
       assert styles["t-bracket-3"] == ["t-bracket-3"]
       assert styles["t-bracket-4"] == ["t-bracket-4"]
+      assert styles["t-bracket-5"] == ["t-bracket-5"]
+      assert styles["t-bracket-6"] == ["t-bracket-6"]
 
       assert styles["t-slot-string-1"] == ["t-slot-string-1"]
       assert styles["t-local-component-string-1"] == ["t-local-component-string-1"]
