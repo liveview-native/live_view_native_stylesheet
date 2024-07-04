@@ -46,6 +46,18 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     |> Enum.reject(&(File.dir?(&1) || &1 == sheet_path))
   end
 
+  defp default_style_attribute_parsers() do
+    [
+      neex: &style_attribute_template_parser/2,
+      ex: &style_attribute_code_parser/2
+    ]
+  end
+
+  defp found_style_attribute_parsers() do
+    Application.get_env(:live_view_native_stylesheet, :attribute_parsers, [])
+    |> Keyword.get(:style, [])
+  end
+
   def run(%{paths: paths}) do
     files =
       paths
@@ -61,22 +73,34 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     styles =
       files
       |> Enum.reduce([], fn({content, path}, acc) ->
-        cond do
-          path =~ ~r/\.neex$/ ->
-            acc ++ parse_style(content, path)
-          path =~ ~r/\.ex$/ ->
-            acc ++
-              (content
-              |> extract_templates()
-              |> Enum.map(&parse_style(elem(&1, 0), path, elem(&1, 1))))
-          true ->
-            acc
+        ext =
+          path
+          |> Path.extname()
+          |> String.split(".")
+          |> List.last()
+          |> String.to_atom()
+
+        parsers = default_style_attribute_parsers() ++ found_style_attribute_parsers()
+
+        case Keyword.fetch(parsers, ext) do
+          {:ok, func} -> acc ++ func.(content, path)
+          :error -> acc
         end
       end)
       |> List.flatten()
       |> Enum.uniq()
 
     {class_names, styles}
+  end
+
+  defp style_attribute_template_parser(content, path) do
+    parse_style(content, path)
+  end
+
+  defp style_attribute_code_parser(content, path) do
+    content
+    |> extract_templates()
+    |> Enum.map(&parse_style(elem(&1, 0), path, elem(&1, 1)))
   end
 
   defp extract_templates(content) do

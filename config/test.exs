@@ -13,4 +13,9 @@ config :live_view_native_stylesheet,
       {:live_view_native, "lib/**/*.*"}
     ]
   ],
-  output: "priv/static/assets"
+  output: "priv/static/assets",
+  attribute_parsers: [
+    style: [
+      other: &LiveViewNative.Stylesheet.Extractor.parse_style/2
+    ]
+  ]
