@@ -55,5 +55,14 @@ defmodule MockSheetTest do
 
       refute Map.has_key?(styles, "t-illegal")
     end
+
+    test "parses from other file types defined in config" do
+      {styles, _} =
+        File.read!("priv/static/assets/mock_sheet.styles")
+        |> Code.eval_string()
+
+
+      assert styles["t-other-1"] == ["t-other-1"]
+    end
   end
 end
