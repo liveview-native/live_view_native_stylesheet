@@ -29,6 +29,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
 
   @inner_match_global_regexp ~r/[^<>"'`\s.(){}[\]#=%]*[^<>"'`\s.(){}[\]#=%:]/
 
+  @doc false
   def scan(content) do
     broad_matches = Regex.scan(@broad_match_global_regexp, content)
     inner_matches = Regex.run(@inner_match_global_regexp, content)
@@ -36,6 +37,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     [broad_matches, inner_matches]
   end
 
+  @doc false
   def paths(sheet_path, format) do
     Application.get_env(:live_view_native_stylesheet, :content, [])
     |> Keyword.get(format, [])
@@ -58,6 +60,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     |> Keyword.get(:style, [])
   end
 
+  @doc false
   def run(%{paths: paths}) do
     files =
       paths
@@ -103,7 +106,8 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     |> Enum.map(&parse_style(elem(&1, 0), path, elem(&1, 1)))
   end
 
-  defp extract_templates(content) do
+  @doc false
+  def extract_templates(content) do
     case Code.string_to_quoted(content) do
       {:ok, quoted} ->
         Macro.prewalk(quoted, [], fn
@@ -115,6 +119,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     |> elem(1)
   end
 
+  @doc false
   def parse_style(template, path, opts \\ [])
   def parse_style(nil, _path, _opts), do: []
   def parse_style(template, path, opts) do
