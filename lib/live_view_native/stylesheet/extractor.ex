@@ -114,9 +114,9 @@ defmodule LiveViewNative.Stylesheet.Extractor do
           {:sigil_LVN, _, [{:<<>>, annotations, [template]}, []]} =  node, acc -> {node, [{template, annotations} | acc]}
           node, acc -> {node, acc}
         end)
-      _ -> nil
+        |> elem(1)
+      _ -> []
     end
-    |> elem(1)
   end
 
   @doc false
