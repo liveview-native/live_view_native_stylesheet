@@ -46,6 +46,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     |> Enum.map(&Path.wildcard(&1))
     |> List.flatten()
     |> Enum.reject(&(File.dir?(&1) || &1 == sheet_path))
+    |> Enum.uniq()
   end
 
   defp default_style_attribute_parsers() do
