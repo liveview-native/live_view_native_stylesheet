@@ -57,14 +57,6 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
   end
 
   @doc false
-  def run_generators(context) do
-
-    Mix.Task.run("lvn.stylesheet.gen", [])
-
-    context
-  end
-
-  @doc false
   def config({context, source_files}) do
     {context, source_files}
     |> patch_config()
@@ -73,15 +65,16 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
 
   @doc false
   def patch_config({context, %{config: {source, path}} = source_files}) do
-    {_context, source} =
-      {context, source}
+    {_context, {source, _path}} =
+      {context, {source, path}}
       |> patch_stylesheet_config()
+      |> patch_mime_types()
 
     {context, %{source_files | config: {source, path}}}
   end
 
   @doc false
-  def patch_stylesheet_config({context, source}) do
+  def patch_stylesheet_config({context, {source, path}}) do
     formats =
       Mix.LiveViewNative.plugins()
       |> Enum.map(&(elem(&1, 1).format))
@@ -94,6 +87,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
         ]<%= unless last?(formats, format) do %>,<% end %><% end %>
       ],
       output: "priv/static/assets"
+
     """
     |> compile_string()
 
@@ -107,9 +101,9 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
     you can do this manually or inspect config/config.exs for errors and try again
     """
 
-    source = CodeGen.patch(source, change, merge: &merge_stylesheet_config/2, inject: {:before, matcher}, fail_msg: fail_msg)
+    source = CodeGen.patch(source, change, merge: &merge_stylesheet_config/2, inject: {:before, matcher}, fail_msg: fail_msg, path: path)
 
-    {context, source}
+    {context, {source, path}}
   end
 
   defp merge_stylesheet_config(source, change) do
@@ -152,10 +146,64 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
   end
 
   @doc false
+  def patch_mime_types({context, {source, path}}) do
+    change = """
+    config :mime, :types, %{
+      "text/styles" => ["styles"]
+    }
+
+    """
+    |> compile_string()
+
+    matcher = &(match?({:import_config, _, _}, &1))
+
+    fail_msg = """
+    failed to merge or inject the following in code into config/config.exs
+
+    #{change}
+
+    you can do this manually or inspect config/config.exs for errors and try again
+    """
+
+    source = CodeGen.patch(source, change, merge: &merge_mime_types/2, inject: {:before, matcher}, fail_msg: fail_msg, path: path)
+
+    {context, {source, path}}
+  end
+
+  defp merge_mime_types(source, change) do
+    quoted_change = Sourceror.parse_string!(change)
+
+    source
+    |> Sourceror.parse_string!()
+    |> Zipper.zip()
+    |> Zipper.find(&match?({:config, _, [{:__block__, _, [:mime]}, {:__block__, _, [:types]} | _]}, &1))
+    |> case do
+      nil -> :error
+      %{node: {:config, _, [_, _, quoted_source_map]}} ->
+        {:config, _, [_, _, quoted_change_map]} = quoted_change
+        range = Sourceror.get_range(quoted_source_map)
+        source_map = Code.eval_quoted(quoted_source_map) |> elem(0)
+        change_map = Code.eval_quoted(quoted_change_map) |> elem(0)
+
+        plugins_list = Map.merge(source_map, change_map) |> Map.to_list()
+
+        change = """
+          %{<%= for {mime_type, extension} = plugin <- plugins_list do %>
+            <%= inspect mime_type %> => <%= inspect extension %><%= unless last?(plugins_list, plugin) do %>,<% end %><% end %>
+          }
+          """
+          |> compile_string()
+          |> String.trim()
+
+        [build_patch(range, change)]
+    end
+  end
+
+  @doc false
   def patch_dev({context, %{dev: {source, path}} = source_files}) do
 
-    {_context, source} =
-      {context, source}
+    {_context, {source, _path}} =
+      {context, {source, path}}
       |> patch_live_reload_patterns()
       |> patch_stylesheet_dev()
 
@@ -163,7 +211,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
   end
 
   @doc false
-  def patch_live_reload_patterns({context, source}) do
+  def patch_live_reload_patterns({context, {source, path}}) do
     web_path = Mix.Phoenix.web_path(context.context_app)
 
     change = """
@@ -182,9 +230,9 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
     you can do this manually or inspect config/dev.exs for errors and try again
     """
 
-    source = CodeGen.patch(source, change, merge: &merge_live_reload_patterns/2, fail_msg: fail_msg)
+    source = CodeGen.patch(source, change, merge: &merge_live_reload_patterns/2, fail_msg: fail_msg, path: path)
 
-    {context, source}
+    {context, {source, path}}
   end
 
   defp merge_live_reload_patterns(source, change) do
@@ -218,8 +266,9 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
     end
   end
 
-  def patch_stylesheet_dev({context, source}) do
+  def patch_stylesheet_dev({context, {source, path}}) do
     change = """
+
     config :live_view_native_stylesheet,
       annotations: true,
       pretty: true
@@ -234,9 +283,9 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
     you can do this manually or inspect config/config.exs for errors and try again
     """
 
-    source = CodeGen.patch(source, change, merge: &merge_stylesheet_dev/2, inject: :eof, fail_msg: fail_msg)
+    source = CodeGen.patch(source, change, merge: &merge_stylesheet_dev/2, inject: :eof, fail_msg: fail_msg, path: path)
 
-    {context, source}
+    {context, {source, path}}
   end
 
   defp merge_stylesheet_dev(source, _change) do

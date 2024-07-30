@@ -39,6 +39,12 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
               ],
               output: "priv/static/assets"
             """
+
+          assert file =~ """
+            config :mime, :types, %{
+              "text/styles" => ["styles"]
+            }
+            """
         end
 
         assert_file "config/dev.exs", fn file ->
@@ -131,7 +137,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
           output: "priv/static/other_assets"
         """
 
-      {_, result} = Config.patch_stylesheet_config({%{}, config})
+      {_, {result, _}} = Config.patch_stylesheet_config({%{}, {config, "config/config.exs"}})
 
       assert result =~ """
         config :live_view_native_stylesheet,
@@ -156,7 +162,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
           annotations: true
       """
 
-      {_, result} = Config.patch_stylesheet_dev({%{}, config})
+      {_, {result, _}} = Config.patch_stylesheet_dev({%{}, {config, "config/dev.exs"}})
 
       assert result
     end
