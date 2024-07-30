@@ -1,0 +1,10 @@
+import Config
+
+config :live_view_native_stylesheet, LiveViewNativeStylesheetWeb.Endpoint,
+  live_reload: [
+    patterns: [
+      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/gettext/.*(po)$",
+      ~r"lib/live_view_native_stylesheet_web/(controllers|live|components)/.*(ex|heex)$"
+    ]
+  ]
