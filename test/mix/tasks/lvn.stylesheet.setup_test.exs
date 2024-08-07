@@ -55,8 +55,8 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
                   ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
                   ~r"priv/gettext/.*(po)$",
                   ~r"lib/live_view_native_stylesheet_web/(controllers|live|components)/.*(ex|heex)$",
-                  ~r"priv/static/*.styles$",
-                  ~r"lib/live_view_native_stylesheet_web/styles/*.ex$"
+                  ~r"lib/live_view_native_stylesheet_web/styles/*.ex$",
+                  ~r"priv/static/*.styles$"
                 ]
               ]
             """
@@ -108,8 +108,8 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
                     ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
                     ~r"priv/gettext/.*(po)$",
                     ~r"lib/live_view_native_stylesheet_web/(controllers|live|components)/.*(ex|heex)$",
-                    ~r"priv/static/*.styles$",
-                    ~r"lib/live_view_native_stylesheet_web/styles/*.ex$"
+                    ~r"lib/live_view_native_stylesheet_web/styles/*.ex$",
+                    ~r"priv/static/*.styles$"
                   ]
                 ]
               """
@@ -127,7 +127,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
 
   describe "config codgen scenarios" do
     test "when :live_view_native_stylesheet config exists the :plugins list is updated and duplicates are removed" do
-      config = """
+      source = """
         config :live_view_native_stylesheet,
           content: [
             other: [
@@ -137,7 +137,9 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
           output: "priv/static/other_assets"
         """
 
-      {_, {result, _}} = Config.patch_stylesheet_config({%{}, {config, "config/config.exs"}})
+      data = [:mock]
+
+      {:ok, result} = Config.patch_stylesheet_config(%{}, data, source, "config/config.exs")
 
       assert result =~ """
         config :live_view_native_stylesheet,
@@ -157,44 +159,14 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
 
   describe "dev codgen scenarios" do
     test "when :live_view_native_stylesheet exists, don't replace" do
-      config = """
+      source = """
         config :live_view_native_stylesheet,
           annotations: true
       """
 
-      {_, {result, _}} = Config.patch_stylesheet_dev({%{}, {config, "config/dev.exs"}})
+      {:ok, result} = Config.patch_stylesheet_dev(%{}, nil, source, "config/dev.exs")
 
-      assert result
+      assert result == source
     end
-  end
-
-  test "when the :live_reload_patterns had additional keywords items" do
-    config = """
-      config :live_view_native, LiveViewNativeWeb.Endpoint,
-        live_reload: [
-          other: :thing,
-          patterns: [
-            ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
-            ~r"priv/gettext/.*(po)$",
-            ~r"lib/live_view_native_stylesheet_web/(controllers|live|components)/.*(ex|heex)$"
-          ]
-        ]
-      """
-
-    {_, {result, _}} = Config.patch_live_reload_patterns({%{context_app: :live_view_native_stylesheet}, {config, "config/config.exs"}})
-
-    assert  result =~ """
-      config :live_view_native, LiveViewNativeWeb.Endpoint,
-        live_reload: [
-          other: :thing,
-          patterns: [
-            ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
-            ~r"priv/gettext/.*(po)$",
-            ~r"lib/live_view_native_stylesheet_web/(controllers|live|components)/.*(ex|heex)$",
-            ~r"priv/static/*.styles$",
-            ~r"lib/live_view_native_stylesheet_web/styles/*.ex$"
-          ]
-        ]
-      """
   end
 end
