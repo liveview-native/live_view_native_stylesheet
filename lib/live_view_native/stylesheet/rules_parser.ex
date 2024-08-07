@@ -1,10 +1,15 @@
 defmodule LiveViewNative.Stylesheet.RulesParser do
   @moduledoc false
 
-  defmacro sigil_RULES({:<<>>, _meta, [rules]}, _modifier) do
+  defmacro sigil_RULES({:<<>>, _meta, [rules]}, opts) do
     opts = [
       file: __CALLER__.file,
-      line: __CALLER__.line + 1,
+      line:
+        if is_list(opts) && is_integer(Keyword.get(opts, :line)) do
+          Keyword.get(opts, :line)
+        else
+          __CALLER__.line + 1
+        end,
       module: __CALLER__.module,
       variable_context: nil
     ]
