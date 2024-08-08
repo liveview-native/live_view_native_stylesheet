@@ -101,6 +101,7 @@ defmodule LiveViewNative.Stylesheet.SheetParser.Block do
         ]
       else
         [
+          line: context.block_line,
           annotations: context.context.annotations
         ]
       end

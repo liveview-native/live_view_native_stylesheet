@@ -107,7 +107,7 @@ defmodule LiveViewNative.Stylesheet.SheetParserTest do
       result = SheetParser.parse(sheet, file: @file_path, module: @module)
       Application.delete_env(:live_view_native_stylesheet, :annotations)
 
-      assert result == [{["color-red"], [annotations: false], "color(.red)"}]
+      assert result == [{["color-red"], [line: 2, annotations: false], "color(.red)"}]
     end
 
     @annotations true

@@ -46,10 +46,10 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
         module: __CALLER__.module
       )
 
-    for {arguments, _opts, body} <- blocks do
+    for {arguments, opts, body} <- blocks do
       quote do
         def class(unquote_splicing(arguments)) do
-          sigil_RULES(<<unquote(body)>>, [])
+          sigil_RULES(<<unquote(body)>>, unquote(opts))
         end
       end
     end
