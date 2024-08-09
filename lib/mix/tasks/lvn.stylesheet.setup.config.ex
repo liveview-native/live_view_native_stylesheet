@@ -15,6 +15,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
 
   import Mix.Tasks.Lvn.Setup.Config, only: [
     run_changesets: 2,
+    config_path_for: 1,
     patch_mime_types: 4,
     import_config_matcher: 1,
     patch_live_reload_patterns: 4
@@ -48,11 +49,14 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
   end
 
   def build_changesets(context) do
+    config_path = config_path_for("config.exs")
+    dev_path = config_path_for("dev.exs")
+
     [
-      {patch_stylesheet_config_data(context), &patch_stylesheet_config/4, "config/config.exs"},
-      {patch_mime_types_data(context), &patch_mime_types/4, "config/config.exs"},
-      {patch_live_reload_patterns_data(context), &patch_live_reload_patterns/4, "config/dev.exs"},
-      {nil, &patch_stylesheet_dev/4, "config/dev.exs"}
+      {patch_stylesheet_config_data(context), &patch_stylesheet_config/4, config_path},
+      {patch_mime_types_data(context), &patch_mime_types/4, config_path},
+      {patch_live_reload_patterns_data(context), &patch_live_reload_patterns/4, dev_path},
+      {nil, &patch_stylesheet_dev/4, dev_path}
     ]
   end
 
