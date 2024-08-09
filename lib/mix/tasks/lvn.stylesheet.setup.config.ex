@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
     context
   end
 
-  defp build_changesets(context) do
+  def build_changesets(context) do
     [
       {patch_stylesheet_config_data(context), &patch_stylesheet_config/4, "config/config.exs"},
       {patch_mime_types_data(context), &patch_mime_types/4, "config/config.exs"},
