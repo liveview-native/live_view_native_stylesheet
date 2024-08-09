@@ -16,6 +16,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
   import Mix.Tasks.Lvn.Setup.Config, only: [
     run_changesets: 2,
     patch_mime_types: 4,
+    import_config_matcher: 1,
     patch_live_reload_patterns: 4
   ]
 
@@ -81,8 +82,6 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
     """
     |> compile_string()
 
-    matcher = &(match?({:import_config, _, _}, &1))
-
     fail_msg = """
     failed to merge or inject the following in code into config/config.exs
 
@@ -91,7 +90,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
     you can do this manually or inspect config/config.exs for errors and try again
     """
 
-    CodeGen.patch(source, change, merge: &merge_stylesheet_config/2, inject: {:before, matcher}, fail_msg: fail_msg, path: path)
+    CodeGen.patch(source, change, merge: &merge_stylesheet_config/2, inject: {:before, &import_config_matcher/1}, fail_msg: fail_msg, path: path)
   end
 
   defp merge_stylesheet_config(source, change) do
