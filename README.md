@@ -12,7 +12,7 @@ by adding `live_view_native_stylesheet` to your list of dependencies in `mix.exs
 ```elixir
 def deps do
   [
-    {:live_view_native_stylesheet, "~> 0.1.0"}
+    {:live_view_native_stylesheet, "~> 0.3.0-rc.4"}
   ]
 end
 ```
