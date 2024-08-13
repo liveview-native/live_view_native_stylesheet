@@ -61,5 +61,11 @@ defmodule LiveViewNative.StylesheetTest do
 
       assert output == ~s(%{"color-number-3" => ["rule-1", "rule-23"]})
     end
+
+    test "will not pattern match on nil or empty string" do
+      output = MockSheet.compile_ast(["color-number-"])
+
+      assert output == %{}
+    end
   end
 end
