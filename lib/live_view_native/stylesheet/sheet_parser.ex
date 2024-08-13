@@ -47,10 +47,20 @@ defmodule LiveViewNative.Stylesheet.SheetParser do
       )
 
     for {arguments, opts, body} <- blocks do
-      quote do
-        def class(unquote_splicing(arguments)) do
-          sigil_RULES(<<unquote(body)>>, unquote(opts))
-        end
+      case arguments do
+        [{:<>, _, [_arg1, arg_2]}] = arguments ->
+          quote do
+            def class(unquote_splicing(arguments)) when unquote(arg_2) not in [nil, ""] do
+              sigil_RULES(<<unquote(body)>>, unquote(opts))
+            end
+          end
+
+        arguments ->
+          quote do
+            def class(unquote_splicing(arguments)) do
+              sigil_RULES(<<unquote(body)>>, unquote(opts))
+            end
+          end
       end
     end
   end

@@ -17,3 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * fixed line numbers for `~SHEET`
 * refactor `lvn.stylsheet.setup.config` to use `live_view_native`'s updated codegen api
+
+### Fixed
+
+* resolved issue where pattern matched class names were matching `nil` and `""`
