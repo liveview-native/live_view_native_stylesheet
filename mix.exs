@@ -1,7 +1,7 @@
 defmodule LiveViewNative.Stylesheet.MixProject do
   use Mix.Project
 
-  @version "0.3.0-rc.5"
+  @version "0.3.0"
   @source_url "https://github.com/liveview-native/live_view_native_stylesheet"
 
   def project do
@@ -29,7 +29,7 @@ defmodule LiveViewNative.Stylesheet.MixProject do
 
   defp deps do
     [
-      {:live_view_native, "~> 0.3.0-rc.4"},
+      {:live_view_native, "~> 0.3.0"},
       {:nimble_parsec, "~> 1.3"},
       {:floki, ">= 0.30.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
