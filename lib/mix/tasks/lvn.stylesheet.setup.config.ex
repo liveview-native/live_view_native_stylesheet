@@ -72,7 +72,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Setup.Config do
 
     [
       ~s'~r"priv/static/*.styles$"',
-      ~s'~r"#{ web_path }/styles/*.ex$"'
+      ~s'~r"#{ web_path }/styles/.*ex$"'
     ]
   end
 
