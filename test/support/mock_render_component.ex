@@ -6,6 +6,7 @@ defmodule MockRenderComponent do
     <Text style="c-string-1"/>
     <Text style={"c-bracket-1"}/>
     <Text style={"c-bracket-\"2\""}/>
+    <Text class="c-class-1" style="c-style-1" />
     <Text style={[
     "c-bracket-3",
     ~S(c-bracket-4)

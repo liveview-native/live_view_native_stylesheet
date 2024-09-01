@@ -13,6 +13,14 @@ defmodule MockSheet do
     rule-yellow
   end
 
+  "t-class-1" do
+    t-rules-1
+  end
+
+  "c-class-1" do
+    c-rules-1
+  end
+
   "rule-containing-end" do
     rule-end
   end

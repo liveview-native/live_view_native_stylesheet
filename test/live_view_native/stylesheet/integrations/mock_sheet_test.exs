@@ -61,8 +61,19 @@ defmodule MockSheetTest do
         File.read!("priv/static/assets/mock_sheet.styles")
         |> Code.eval_string()
 
-
       assert styles["t-other-1"] == ["t-other-1"]
+    end
+
+    test "parses class and styles" do
+      {styles, _} =
+        File.read!("priv/static/assets/mock_sheet.styles")
+        |> Code.eval_string()
+
+      assert styles["c-class-1"] == ["c-rules-1"]
+      assert styles["c-style-1"] == ["c-style-1"]
+
+      assert styles["t-class-1"] == ["t-rules-1"]
+      assert styles["t-style-1"] == ["t-style-1"]
     end
   end
 end
