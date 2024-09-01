@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* fix live reload pattern for the sheet file https://github.com/liveview-native/live_view_native_stylesheet/pull/83
+
 ## [0.3.0] 2024-08-21
 
 ### Added

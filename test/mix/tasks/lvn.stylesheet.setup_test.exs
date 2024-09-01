@@ -55,7 +55,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
                   ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
                   ~r"priv/gettext/.*(po)$",
                   ~r"lib/live_view_native_stylesheet_web/(controllers|live|components)/.*(ex|heex)$",
-                  ~r"lib/live_view_native_stylesheet_web/styles/*.ex$",
+                  ~r"lib/live_view_native_stylesheet_web/styles/.*ex$",
                   ~r"priv/static/*.styles$"
                 ]
               ]
@@ -108,7 +108,7 @@ defmodule Mix.Tasks.Lvn.Stylesheet.SetupTest do
                     ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
                     ~r"priv/gettext/.*(po)$",
                     ~r"lib/live_view_native_stylesheet_web/(controllers|live|components)/.*(ex|heex)$",
-                    ~r"lib/live_view_native_stylesheet_web/styles/*.ex$",
+                    ~r"lib/live_view_native_stylesheet_web/styles/.*ex$",
                     ~r"priv/static/*.styles$"
                   ]
                 ]
