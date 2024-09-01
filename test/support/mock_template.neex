@@ -8,6 +8,7 @@
 ~S(t-bracket-4)
 ]}/>
 <Text style={"t-bracket-5;t-bracket-6;; ;  h"}/>
+<Text class="t-class-1" style="t-style-1" />
 style="t-illegal"
 <.image style="t-local-component-string-1">
   <:success style="t-slot-string-1"/>
