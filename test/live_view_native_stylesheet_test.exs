@@ -62,6 +62,12 @@ defmodule LiveViewNative.StylesheetTest do
       assert output == {:ok, ~s({"color-number-3":["rule-1","rule-23"]})}
     end
 
+    test "can convert the output to a string (raising version)" do
+      output = MockSheet.compile_string!(["color-number-3"])
+
+      assert output == ~s({"color-number-3":["rule-1","rule-23"]})
+    end
+
     test "will not pattern match on nil or empty string" do
       output = MockSheet.compile_ast(["color-number-"])
 
