@@ -160,11 +160,18 @@ defmodule LiveViewNative.Stylesheet do
 
         {class_or_list, style_list}
         |> compile_ast()
-        |> Jason.encode!(pretty: pretty)
+        |> Jason.encode(pretty: pretty)
       end
 
       def compile_string(class_or_list) do
         compile_string({class_or_list, []})
+      end
+
+      def compile_string!(input) do
+        case compile_string(input) do
+          {:ok, result} -> result
+          {:error, error} -> raise error
+        end
       end
     end
   end
@@ -288,7 +295,7 @@ defmodule LiveViewNative.Stylesheet do
         compiled_sheet =
           native_opts
           |> LiveViewNative.Stylesheet.Extractor.run()
-          |> module.compile_string()
+          |> module.compile_string!()
 
         file_path = Path.join(output, native_opts[:filename])
 
