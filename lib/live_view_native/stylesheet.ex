@@ -160,36 +160,11 @@ defmodule LiveViewNative.Stylesheet do
 
         {class_or_list, style_list}
         |> compile_ast()
-        |> ast_to_json(pretty)
+        |> Jason.encode!(pretty: pretty)
       end
 
       def compile_string(class_or_list) do
         compile_string({class_or_list, []})
-      end
-
-      def ast_to_json(ast, _pretty) do
-        # TODO: Make use of pretty printing once supported in
-        # erlang
-
-        ast
-        |> :json.encode(&ast_encoder/2)
-        |> IO.iodata_to_binary()
-      end
-
-      defp ast_encoder(nil, encode) do
-        :json.encode_value(:null, encode)
-      end
-
-      defp ast_encoder(value, encode) when is_tuple(value) do
-        :json.encode_list(Tuple.to_list(value), encode)
-      end
-
-      defp ast_encoder([{_, _} | _] = value, encode) do
-        :json.encode_key_value_list(value, encode)
-      end
-
-      defp ast_encoder(other, encode) do
-        :json.encode_value(other, encode)
       end
     end
   end
