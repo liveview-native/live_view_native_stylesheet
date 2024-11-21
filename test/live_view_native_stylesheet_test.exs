@@ -56,10 +56,10 @@ defmodule LiveViewNative.StylesheetTest do
       assert output == %{"color-number-4" => ["rule-1", "rule-24"]}
     end
 
-    test "can convert the output to a string" do
-      output = MockSheet.compile_string(["color-number-3"])
+    test "can convert the output to a json string" do
+      output = MockSheet.compile_string(["complex"])
 
-      assert output == ~s(%{"color-number-3" => ["rule-1", "rule-23"]})
+      assert output == ~s({"complex":[["complex",{"line":33,"module":"MockSheet","file":"mock_sheet.ex"},[1,["complex_sub",{},[]],3]]]})
     end
 
     test "will not pattern match on nil or empty string" do

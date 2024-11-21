@@ -5,6 +5,15 @@ defmodule MockRulesParser do
     |> Enum.map(&parse_rule(&1, opts))
   end
 
+  defp parse_rule("complex-rule", opts) do
+    {:complex,
+     [
+       file: Keyword.get(opts, :file),
+       line: Keyword.get(opts, :line),
+       module: Keyword.get(opts, :module)
+     ], [1, {:complex_sub, [], []}, 3]}
+  end
+
   defp parse_rule("rule-annotated", opts) do
     {:foobar,
      [

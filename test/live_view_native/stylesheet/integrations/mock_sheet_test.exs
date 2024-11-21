@@ -3,21 +3,16 @@ defmodule MockSheetTest do
 
   describe "stylesheet output" do
     test "will compile the stylesheet into an asset file" do
-      {styles, _} =
-        File.read!("priv/static/assets/mock_sheet.styles")
-        |> Code.eval_string()
+      styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
 
       assert styles["color-blue"] == ["rule-2"]
-      assert styles["color-number-3"] == ["rule-1", "rule-23"]
       assert styles["custom-123-456"] == ["rule-123", "rule-456"]
     end
   end
 
   describe "style parsing" do
     test "parses from elixir files containing ~LVN templates" do
-      {styles, _} =
-        File.read!("priv/static/assets/mock_sheet.styles")
-        |> Code.eval_string()
+      styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
 
       assert styles["c-string-1"] == ["c-string-1"]
       assert styles["c-string-2"] == ["c-string-2"]
@@ -35,9 +30,7 @@ defmodule MockSheetTest do
     end
 
     test "parses from template files" do
-      {styles, _} =
-        File.read!("priv/static/assets/mock_sheet.styles")
-        |> Code.eval_string()
+      styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
 
       assert styles["t-string-1"] == ["t-string-1"]
       assert styles["t-string-2"] == ["t-string-2"]
@@ -57,17 +50,13 @@ defmodule MockSheetTest do
     end
 
     test "parses from other file types defined in config" do
-      {styles, _} =
-        File.read!("priv/static/assets/mock_sheet.styles")
-        |> Code.eval_string()
+      styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
 
       assert styles["t-other-1"] == ["t-other-1"]
     end
 
     test "parses class and styles" do
-      {styles, _} =
-        File.read!("priv/static/assets/mock_sheet.styles")
-        |> Code.eval_string()
+      styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
 
       assert styles["c-class-1"] == ["c-rules-1"]
       assert styles["c-style-1"] == ["c-style-1"]

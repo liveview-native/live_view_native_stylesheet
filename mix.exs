@@ -8,7 +8,7 @@ defmodule LiveViewNative.Stylesheet.MixProject do
     [
       app: :live_view_native_stylesheet,
       version: @version,
-      elixir: "~> 1.15",
+      elixir: "~> 1.17",
       description: description(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
