@@ -28,6 +28,10 @@ defmodule MockSheet do
   "nil" do
     {nil}
   end
+
+  "complex" do
+    complex-rule
+  end
   """
 
   def class("color-three") do

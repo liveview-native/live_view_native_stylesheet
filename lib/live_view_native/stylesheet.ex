@@ -98,7 +98,7 @@ defmodule LiveViewNative.Stylesheet do
   The following functions are injected into the module:
 
     * `compile_ast/1` - takes a list of class names, produces AST as an Elixir map
-    * `compile_string/1` - takes a list of class names, produces a string of the AST.
+    * `compile_string/1` - takes a list of class names, produces a string of the AST in JSON.
     Formatting rules are applied from the `live_view_native_stylesheet` application config.
   '''
   defmacro __using__(format) do
@@ -159,7 +159,8 @@ defmodule LiveViewNative.Stylesheet do
 
         {class_or_list, style_list}
         |> compile_ast()
-        |> inspect(limit: :infinity, charlists: :as_list, printable_limit: :infinity, pretty: pretty)
+        |> :json.encode(&LiveViewNative.Stylesheet.Encoder.encode/2)
+        |> IO.iodata_to_binary()
       end
 
       def compile_string(class_or_list) do
