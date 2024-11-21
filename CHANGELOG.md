@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Emit stylesheets as json isntead of Elixir maps
 * pretty printing is not availabile for the time being
+* Elixir 1.17 with OTP 27 is the minimum requirement
 
 ### Fixed
 
