@@ -11,7 +11,7 @@ defmodule MockRulesParser do
        file: Keyword.get(opts, :file),
        line: Keyword.get(opts, :line),
        module: Keyword.get(opts, :module)
-     ], [1, {:complex_sub, [], []}, 3]}
+     ], [1, {:complex_sub, [], [{:foo, "bar"}]}, 3]}
   end
 
   defp parse_rule("rule-annotated", opts) do

@@ -157,9 +157,13 @@ defmodule LiveViewNative.Stylesheet do
       def compile_string({class_or_list, style_list}) do
         pretty = Application.get_env(:live_view_native_stylesheet, :pretty, false)
 
-        {class_or_list, style_list}
-        |> compile_ast()
-        |> :json.encode(&LiveViewNative.Stylesheet.Encoder.encode/2)
+        ast = compile_ast({class_or_list, style_list})
+
+        if Code.ensure_loaded?(:json) && pretty && Kernel.function_exported?(:json, :format, 2) do
+          :json.format(ast, &LiveViewNative.Stylesheet.Encoder.format/3)
+        else
+          :json.encode(ast, &LiveViewNative.Stylesheet.Encoder.encode/2)
+        end
         |> IO.iodata_to_binary()
       end
 
