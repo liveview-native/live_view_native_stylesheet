@@ -7,6 +7,7 @@ defmodule MockSheetTest do
 
       assert styles["color-blue"] == ["rule-2"]
       assert styles["custom-123-456"] == ["rule-123", "rule-456"]
+      assert styles["special"]
     end
   end
 

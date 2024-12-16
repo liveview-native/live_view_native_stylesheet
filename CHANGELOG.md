@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Allow stylsheets to define "special" key/value that can be compiled into the output asset
+
 ### Changed
 
-* Emit stylesheets as json isntead of Elixir maps
+* Emit stylesheets as json instead of Elixir maps
 * pretty printing is not availabile for the time being
 * Elixir 1.17 with OTP 27 is the minimum requirement
 
