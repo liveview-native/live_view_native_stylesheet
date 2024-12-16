@@ -108,6 +108,9 @@ defmodule LiveViewNative.Stylesheet do
       format: format,
     })
 
+    plugin = LiveViewNative.fetch_plugin!(format)
+    plugin_stylesheet = plugin.stylesheet
+
     quote do
       Module.register_attribute(__MODULE__, :import, accumulate: true)
 
@@ -117,6 +120,13 @@ defmodule LiveViewNative.Stylesheet do
       @format unquote(format)
       @before_compile LiveViewNative.Stylesheet
       @after_verify LiveViewNative.Stylesheet
+
+      unquote(if plugin_stylesheet do
+        quote do
+          use unquote(plugin_stylesheet)
+          @before_compile unquote(plugin_stylesheet)
+        end
+      end)
 
       def compile_ast({class_or_list, style_list}) do
         class_map =
@@ -147,7 +157,15 @@ defmodule LiveViewNative.Stylesheet do
             {style, List.wrap(style_ast)}
           end)
 
-        Map.merge(class_map, style_map)
+        unquote(if plugin_stylesheet do
+          quote do
+            class_map
+            |> Map.merge(style_map)
+            |> Map.merge(special())
+          end
+        else
+          quote do: Map.merge(class_map, style_map)
+        end)
       end
 
       def compile_ast(class_or_list) do
