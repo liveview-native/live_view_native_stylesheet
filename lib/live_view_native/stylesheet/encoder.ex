@@ -7,6 +7,9 @@ defmodule LiveViewNative.Stylesheet.Encoder do
   def format({name, value}, encoder, state) when is_atom(name),
     do: :json.format_value(%{{name, value}}, encoder, state)
 
+  def format(nil, _encoder, _state),
+    do: ~c(null)
+
   def format(atom, encoder, state) when is_atom(atom) do
     cond do
       Code.ensure_loaded?(atom) ->
