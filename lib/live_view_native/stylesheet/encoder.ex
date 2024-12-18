@@ -27,6 +27,10 @@ defmodule LiveViewNative.Stylesheet.Encoder do
   def encode({name, value}, encoder) when is_atom(name),
     do: :json.encode_map(%{{name, value}}, encoder)
 
+
+  def encode(nil, _encoder),
+    do: ~c(null)
+
   def encode(atom, encoder) when is_atom(atom) do
     cond do
       Code.ensure_loaded?(atom) ->
