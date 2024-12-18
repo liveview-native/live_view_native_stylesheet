@@ -10,7 +10,8 @@ config :live_view_native_stylesheet,
   content: [
     mock: [
       "test/**/*.*",
-      {:live_view_native, "lib/**/*.*"}
+      {:live_view_native, "lib/**/*.*"},
+      {:another_library, "lib/**/*.*"}
     ]
   ],
   output: "priv/static/assets",

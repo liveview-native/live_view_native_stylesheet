@@ -35,7 +35,7 @@ defmodule LiveViewNative.Stylesheet do
   for a format:
 
       content: [
-        swifti: [
+        swiftui: [
           "lib/**/*swiftui*",
           {:my_custom_lib, "lib/**/*swiftui*"},
           {:other_lib, [
