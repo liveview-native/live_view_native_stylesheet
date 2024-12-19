@@ -10,7 +10,6 @@ defmodule Mix.Tasks.Lvn.Stylesheet.GenTest do
     :ok
   end
 
-
   describe "when a single app" do
     test "generates the stylesheet for the request format into the `styles` directory", config do
       in_tmp_live_project config.test, fn ->
