@@ -20,11 +20,13 @@ defmodule Mix.Tasks.Lvn.Stylesheet.Gen do
   @doc false
   def run(args) do
     context = Context.build(args, __MODULE__)
-    files = files_to_be_generated(context)
+    if context.format != :html do
+      files = files_to_be_generated(context)
 
-    Context.prompt_for_conflicts(files)
+      Context.prompt_for_conflicts(files)
 
-    copy_new_files(context, files)
+      copy_new_files(context, files)
+    end
   end
 
   @doc false
