@@ -135,7 +135,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
           text = List.to_string(tokens)
           meta = [line: meta.line, column: meta.column]
 
-          {tokens, _context} = Tokenizer.tokenize(text, meta, [], :text, state)
+          {tokens, _context} = Tokenizer.tokenize(text, meta, [], {:text, :enabled}, state)
 
           tokens_acc ++ tokens
 
