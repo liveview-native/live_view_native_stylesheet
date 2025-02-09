@@ -14,7 +14,7 @@ defmodule MockRenderComponent do
     """
   end
 
-  def modal(assigns) do
+  def modal(assigns, _interface) do
     assigns = Map.put(assigns, :style, "c-assign-1")
 
     ~LVN"""
@@ -28,7 +28,7 @@ defmodule MockRenderComponent do
     """
   end
 
-  def image(assigns) do
+  def image(assigns, _interface) do
     ~LVN"""
     <image></image>
     """

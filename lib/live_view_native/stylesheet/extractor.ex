@@ -127,7 +127,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     {:ok, eex_nodes} = EEx.tokenize(template)
 
     indentation = Keyword.get(opts, :indentation, 0)
-    state = Tokenizer.init(indentation, path, template, LiveViewNative.TagEngine)
+    state = Tokenizer.init(indentation, path, template, LiveViewNative.Template.Engine)
 
     tokens =
       Enum.reduce(eex_nodes, [], fn
@@ -135,7 +135,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
           text = List.to_string(tokens)
           meta = [line: meta.line, column: meta.column]
 
-          {tokens, _context} = Tokenizer.tokenize(text, meta, [], :text, state)
+          {tokens, _context} = Tokenizer.tokenize(text, meta, [], {:text, :enabled}, state)
 
           tokens_acc ++ tokens
 
