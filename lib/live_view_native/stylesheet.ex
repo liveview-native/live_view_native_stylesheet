@@ -233,13 +233,23 @@ defmodule LiveViewNative.Stylesheet do
         |> Path.relative_to_cwd()
         |> LiveViewNative.Stylesheet.Extractor.paths(format)
 
+      format_app = app_for_format(format)
+
+      versions = Enum.map([
+        :live_view_native,
+        :live_view_native_stylesheet,
+        format_app
+      ], &LiveViewNative.Stylesheet.app_version(&1))
+
+      data = [paths, versions]
+
       filename =
         Path.basename(env.file)
         |> String.split(".ex")
         |> Enum.at(0)
         |> Kernel.<>(".styles")
 
-      file_hash = :erlang.md5(paths)
+      file_hash = :erlang.md5(data)
 
       content =
         Application.get_env(:live_view_native_stylesheet, :content, [])
@@ -284,19 +294,44 @@ defmodule LiveViewNative.Stylesheet do
               |> Path.join(native_opts[:filename])
               |> File.exists?()
 
-            file_hash =
+            paths =
               unquote(env.file)
               |> Path.relative_to_cwd()
               |> LiveViewNative.Stylesheet.Extractor.paths(@format)
-              |> :erlang.md5()
 
-            !(output_file_exists? && @stylesheet_paths_hash == file_hash)
+            format_app = LiveViewNative.Stylesheet.app_for_format(@format)
+
+            versions = Enum.map([
+              :live_view_native,
+              :live_view_native_stylesheet,
+              format_app
+            ], &LiveViewNative.Stylesheet.app_version(&1))
+
+            hash = :erlang.md5([paths, versions])
+
+            !(output_file_exists? && @stylesheet_paths_hash == hash)
           else
             false
           end
         end
       end
     end
+  end
+
+  @doc false
+  def app_for_format(format) do
+    case LiveViewNative.fetch_plugin(format) do
+      {:ok, %{__struct__: module}} ->
+        Application.started_applications()
+        |> Enum.map(&elem(&1, 0))
+        |> Enum.find(&(Enum.member?(Application.spec(&1, :modules), module)))
+      _error -> :error
+    end
+  end
+
+  @doc false
+  def app_version(app) do
+    Application.spec(app, :vsn) || "unknown"
   end
 
   @doc false
