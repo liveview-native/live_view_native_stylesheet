@@ -43,6 +43,7 @@ defmodule LiveViewNative.Stylesheet.Extractor do
     |> Keyword.get(format, [])
     |> Enum.map(&convert_to_path(&1))
     |> List.flatten()
+    |> Enum.reject(&is_nil/1)
     |> Enum.map(&Path.wildcard(&1))
     |> List.flatten()
     |> Enum.reject(&(File.dir?(&1) || &1 == sheet_path))
@@ -216,8 +217,9 @@ defmodule LiveViewNative.Stylesheet.Extractor do
 
   defp convert_to_path(pattern) when is_binary(pattern), do: pattern
   defp convert_to_path({otp_app, pattern}) when is_binary(pattern) do
-    Mix.Project.deps_paths[otp_app]
-    |> Path.join(pattern)
+    if app_path = Mix.Project.deps_paths()[otp_app] do
+      Path.join(app_path, pattern)
+    end
   end
   defp convert_to_path({otp_app, patterns}) when is_list(patterns) do
     Enum.map(patterns, &(convert_to_path({otp_app, &1})))
