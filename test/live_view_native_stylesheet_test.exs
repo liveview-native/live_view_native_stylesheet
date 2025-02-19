@@ -59,7 +59,7 @@ defmodule LiveViewNative.StylesheetTest do
     test "can convert the output to a json string" do
       output = MockSheet.compile_string(["complex"])
 
-      assert output == ~s({"complex":[["complex",{"line":33,"module":"MockSheet","file":"mock_sheet.ex"},[1,["complex_sub",{},[{"foo":"bar"}]],3]]],"special":true})
+      assert output == ~s({"complex":[["complex",{"line":35,"module":"MockSheet","file":"mock_sheet.ex"},[1,["complex_sub",{},[{"foo":"bar"}]],3]]],"special":true})
     end
 
     test "will not pattern match on nil or empty string" do

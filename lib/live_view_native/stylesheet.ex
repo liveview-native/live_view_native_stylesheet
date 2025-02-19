@@ -80,6 +80,19 @@ defmodule LiveViewNative.Stylesheet do
           ...
         """
       end
+
+  ## Safe lists
+  
+  Safe lists are similar to the Tailwind `safelist` configuration option. You can define any
+  number of class names that will always compile into the stylesheet. Unlike Tailwind you define
+  the safe list inside each stylsheet:
+
+      defmodule MyWebApp.Style.SwiftUI do
+        use LiveViewNative.Stylesheet, :swiftui
+
+        @safe_list ~w{red-block dark-mode-searchable}
+
+  If an import has a safe list it will be imported into the importing sheet.
   '''
 
   @doc ~S'''
@@ -113,6 +126,7 @@ defmodule LiveViewNative.Stylesheet do
 
     quote do
       Module.register_attribute(__MODULE__, :import, accumulate: true)
+      Module.register_attribute(__MODULE__, :safe_list, accumulate: true)
 
       import LiveViewNative.Stylesheet.SheetParser, only: [sigil_SHEET: 2]
       import LiveViewNative.Stylesheet.RulesParser, only: [sigil_RULES: 2]
@@ -209,11 +223,13 @@ defmodule LiveViewNative.Stylesheet do
     format = Module.get_attribute(env.module, :format)
     export? = Module.get_attribute(env.module, :export, false)
     imports = Module.get_attribute(env.module, :import, [])
+    safe_list = Module.get_attribute(env.module, :safe_list, [])
 
     if export? do
       native_opts = %{
         imports: imports,
-        export?: export?
+        export?: export?,
+        safe_list: safe_list
       }
 
       quote do
@@ -261,6 +277,7 @@ defmodule LiveViewNative.Stylesheet do
         paths: paths,
         filename: filename,
         format: format,
+        safe_list: safe_list,
         config: %{
           content: content,
           output: output
@@ -273,6 +290,10 @@ defmodule LiveViewNative.Stylesheet do
 
         for path <- unquote(paths) do
           @external_resource path
+        end
+
+        for import <- unquote(imports) do
+          @safe_list Map.get(import.__native_opts__(), :safe_list, [])
         end
 
         def __native_opts__ do
@@ -335,17 +356,31 @@ defmodule LiveViewNative.Stylesheet do
   end
 
   @doc false
+  def inject_safe_list({class_or_list, style_list}, safe_list) do
+    class_or_list =
+      class_or_list
+      |> List.wrap()
+      |> List.insert_at(-1, safe_list)
+      |> List.flatten()
+
+    {class_or_list, style_list}
+  end
+
+  @doc false
   def __after_verify__(module) do
     native_opts = module.__native_opts__()
 
     output = get_in(native_opts, [:config, :output])
     export? = Map.get(native_opts, :export?, false)
 
+    safe_list = Map.get(native_opts, :safe_list, [])
+
     cond do
       output && !export? ->
         compiled_sheet =
           native_opts
           |> LiveViewNative.Stylesheet.Extractor.run()
+          |> LiveViewNative.Stylesheet.inject_safe_list(safe_list)
           |> module.compile_string()
 
         file_path = Path.join(output, native_opts[:filename])

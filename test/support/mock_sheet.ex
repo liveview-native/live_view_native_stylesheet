@@ -1,6 +1,8 @@
 defmodule MockSheet do
   use LiveViewNative.Stylesheet, :mock
 
+  @safe_list ~w{safe_list}
+
   ~SHEET"""
   "color-number-" <> number do
     rule-1
@@ -31,6 +33,10 @@ defmodule MockSheet do
 
   "complex" do
     complex-rule
+  end
+
+  "safe_list" do
+    safe_list
   end
   """
 

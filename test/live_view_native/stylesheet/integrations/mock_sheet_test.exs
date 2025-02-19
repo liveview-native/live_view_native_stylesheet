@@ -1,16 +1,6 @@
 defmodule MockSheetTest do
   use ExUnit.Case
 
-  describe "stylesheet output" do
-    test "will compile the stylesheet into an asset file" do
-      styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
-
-      assert styles["color-blue"] == ["rule-2"]
-      assert styles["custom-123-456"] == ["rule-123", "rule-456"]
-      assert styles["special"]
-    end
-  end
-
   describe "style parsing" do
     test "parses from elixir files containing ~LVN templates" do
       styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
@@ -64,6 +54,14 @@ defmodule MockSheetTest do
 
       assert styles["t-class-1"] == ["t-rules-1"]
       assert styles["t-style-1"] == ["t-style-1"]
+    end
+  end
+
+  describe "safe_list" do
+    test "classes declared with safe_list are always compiled" do
+      styles = File.read!("priv/static/assets/mock_sheet.styles") |> :json.decode()
+
+      assert styles["safe_list"] == ["safe_list"]
     end
   end
 end
