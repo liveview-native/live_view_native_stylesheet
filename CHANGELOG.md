@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Allow stylsheets to define "special" key/value that can be compiled into the output asset
+- Added @safe_list for always-compile class names
 
 ### Changed
 

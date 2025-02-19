@@ -9,7 +9,7 @@ config :live_view_native, :plugins, [
 config :live_view_native_stylesheet,
   content: [
     mock: [
-      "test/**/*.*",
+      "test/support/**/*.*",
       {:live_view_native, "lib/**/*.*"}
     ]
   ],

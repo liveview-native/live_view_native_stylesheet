@@ -13,5 +13,11 @@ defmodule ChildSheetTest do
     test "should not compile to file" do
       refute File.exists?("priv/static/assets/child_sheet.styles")
     end
+
+    test "Parent will inherit and combine child safe lists" do
+      styles = File.read!("priv/static/assets/parent_sheet.styles") |> :json.decode()
+      assert styles["child-safe"] == ["child-safe"]
+      assert styles["parent-safe"] == ["parent-safe"]
+    end
   end
 end
